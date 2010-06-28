@@ -1,0 +1,6 @@
+{
+  "port":     "9187",
+  "host":     "dev.dcloud.org",
+  "interval": 3000,
+  "endpoint": "http://dev.dcloud.org/statistics"
+}
