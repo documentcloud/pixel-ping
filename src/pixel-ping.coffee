@@ -8,7 +8,7 @@ querystring: require 'querystring'
 
 
 # Load the configuration, tracking pixel, and remote endpoint.
-configPath:   process.argv[2] or (__dirname + '/config.json')
+configPath:   process.argv[2] or (__dirname + '/../config.json')
 config:       JSON.parse fs.readFileSync(configPath).toString()
 pixel:        new Buffer(43);
 pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
@@ -34,7 +34,9 @@ record: (params) ->
 flush: ->
   log store
   return unless config.endpoint
-  data: querystring.stringify {json: JSON.stringify(store)}
+  data: {json: JSON.stringify(store)}
+  data.secret: config.secret if config.secret
+  data: querystring.stringify data
   endHeaders['Content-Length']: data.length
   request: endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
