@@ -6,36 +6,39 @@ http:        require 'http'
 {Buffer}:    require 'buffer'
 querystring: require 'querystring'
 
+### The Pixel Ping server
 
-# Set up the in-memory hit store, and the function for recording a hit.
+# The in-memory hit store.
 store: {}
 
+# Record an incoming hit from a remote pixel.
 record: (params) ->
-  return unless loc: params.query?.key
-  store[loc]: or 0
-  store[loc]: +  1
+  return unless key: params.query?.key
+  store[key]: or 0
+  store[key]: +  1
 
+# Serialize the current store, and start a fresh one.
+serialize: ->
+  data:  {json: JSON.stringify(store)}
+  store: {}
+  data.secret: config.secret if config.secret
+  querystring.stringify data
 
-# Flush the store to the external API, and start a new one.
+# Flush the store to be saved by an external API.
 flush: ->
   log store
   return unless config.endpoint
-  data: {json: JSON.stringify(store)}
-  data.secret: config.secret if config.secret
-  data: querystring.stringify data
+  data: serialize()
   endHeaders['Content-Length']: data.length
   request: endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
   request.end()
   sys.puts '--- flushed ---'
-  store: {}
-
 
 # Log the contents of the hits to stdout.
 log: (hash) ->
   for key, hits of hash
     sys.puts "$key:\t$hits"
-
 
 # Create the web server.
 server: http.createServer (req, res) ->
@@ -48,6 +51,7 @@ server: http.createServer (req, res) ->
     res.end ''
   record params
 
+### Configuration
 
 # Load the configuration, tracking pixel, and remote endpoint.
 configPath:   process.argv[2] or (__dirname + '/../config.json')
@@ -62,11 +66,11 @@ if config.endpoint
   endpoint:   http.createClient endParams.port || 80, endParams.host
   endHeaders: {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
 
-
 # Don't let exceptions kill the server.
 process.addListener 'uncaughtException', (err) ->
   sys.puts "Uncaught Exception: ${err}"
 
+### Startup
 
 # Start the server listening, and the periodic flush.
 server.listen config.port, config.host
