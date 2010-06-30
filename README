@@ -27,8 +27,8 @@
   endpoint on your application that can save results from JSON like this:
   
   { 
-    "http://example.com/page1":     276,
-    "http://example.com/article5":  324
+    "/pages/about.html":      276,
+    "/articles/policy.html":  324
   }
   
   The key being the key you passed to the image tag, and the value being the 
@@ -42,7 +42,7 @@
     "host":     "127.0.0.1",
     "port":     "9187",
     "interval": 600,
-    "endpoint": "http://www.example.com/internal/save_hits",
+    "endpoint": "http://www.example.com/internal/save_hits ",
   }
   
   Running "node lib/pixel-ping.js path/to/config.json" will start up the pixel
