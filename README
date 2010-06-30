@@ -18,7 +18,7 @@
   To use Pixel Ping, you insert an image tag that records the hit, along with
   a unique key that is used to distinguish the hits. For example:
   
-  &lt;img src="http://example.com/pixel.gif?key=13" alt="" /&gt;
+  <img src="/pixel.gif?key=13" alt="" />
   
   The key can be any string -- a document id, the url of the page...
   
