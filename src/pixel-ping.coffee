@@ -7,20 +7,6 @@ http:        require 'http'
 querystring: require 'querystring'
 
 
-# Load the configuration, tracking pixel, and remote endpoint.
-configPath:   process.argv[2] or (__dirname + '/../config.json')
-config:       JSON.parse fs.readFileSync(configPath).toString()
-pixel:        new Buffer(43);
-pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
-emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
-pixel.write fs.readFileSync(__dirname + '/pixel.gif', 'binary'), 'binary', 0
-if config.endpoint
-  sys.puts    "Flushing hits to $config.endpoint"
-  endParams:  url.parse config.endpoint
-  endpoint:   http.createClient endParams.port || 80, endParams.host
-  endHeaders: {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
-
-
 # Set up the in-memory hit store, and the function for recording a hit.
 store: {}
 
@@ -62,7 +48,19 @@ server: http.createServer (req, res) ->
     res.end ''
   record params
 
-server.listen config.port, config.host
+
+# Load the configuration, tracking pixel, and remote endpoint.
+configPath:   process.argv[2] or (__dirname + '/../config.json')
+config:       JSON.parse fs.readFileSync(configPath).toString()
+pixel:        new Buffer(43);
+pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
+emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
+pixel.write fs.readFileSync(__dirname + '/pixel.gif', 'binary'), 'binary', 0
+if config.endpoint
+  sys.puts    "Flushing hits to $config.endpoint"
+  endParams:  url.parse config.endpoint
+  endpoint:   http.createClient endParams.port || 80, endParams.host
+  endHeaders: {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
 
 
 # Don't let exceptions kill the server.
@@ -70,5 +68,6 @@ process.addListener 'uncaughtException', (err) ->
   sys.puts "Uncaught Exception: ${err}"
 
 
-# Start the periodic flush.
+# Start the server listening, and the periodic flush.
+server.listen config.port, config.host
 setInterval flush, config.interval * 1000
