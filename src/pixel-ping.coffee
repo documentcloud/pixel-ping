@@ -1,6 +1,5 @@
 # Require core modules.
 fs:          require 'fs'
-sys:         require 'sys'
 url:         require 'url'
 http:        require 'http'
 {Buffer}:    require 'buffer'
@@ -33,12 +32,12 @@ flush: ->
   request: endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
   request.end()
-  sys.puts '--- flushed ---'
+  console.info '--- flushed ---'
 
 # Log the contents of the hits to stdout.
 log: (hash) ->
   for key, hits of hash
-    sys.puts "$key:\t$hits"
+    console.info "$key:\t$hits"
 
 # Create the web server.
 server: http.createServer (req, res) ->
@@ -61,14 +60,14 @@ pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Co
 emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
 pixel.write fs.readFileSync(__dirname + '/pixel.gif', 'binary'), 'binary', 0
 if config.endpoint
-  sys.puts    "Flushing hits to $config.endpoint"
-  endParams:  url.parse config.endpoint
-  endpoint:   http.createClient endParams.port || 80, endParams.host
-  endHeaders: {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
+  console.info "Flushing hits to $config.endpoint"
+  endParams:   url.parse config.endpoint
+  endpoint:    http.createClient endParams.port || 80, endParams.host
+  endHeaders:  {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
 
 # Don't let exceptions kill the server.
 process.addListener 'uncaughtException', (err) ->
-  sys.puts "Uncaught Exception: ${err}"
+  console.error "Uncaught Exception: ${err}"
 
 ### Startup
 
