@@ -56,10 +56,9 @@ server: http.createServer (req, res) ->
 # Load the configuration, tracking pixel, and remote endpoint.
 configPath:   process.argv[2] or (__dirname + '/../config.json')
 config:       JSON.parse fs.readFileSync(configPath).toString()
-pixel:        new Buffer(43);
 pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
 emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
-pixel.write fs.readFileSync(__dirname + '/pixel.gif', 'binary'), 'binary', 0
+pixel:        fs.readFileSync(__dirname + '/pixel.gif')
 if config.endpoint
   sys.puts    "Flushing hits to $config.endpoint"
   endParams:  url.parse config.endpoint
