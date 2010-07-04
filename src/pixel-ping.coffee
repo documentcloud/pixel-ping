@@ -66,7 +66,7 @@ if config.endpoint
   endHeaders: {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
 
 # Don't let exceptions kill the server.
-process.addListener 'uncaughtException', (err) ->
+process.on 'uncaughtException', (err) ->
   sys.puts "Uncaught Exception: ${err}"
 
 ### Startup
