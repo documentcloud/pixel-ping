@@ -32,7 +32,8 @@ flush: ->
   request: endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
   request.end()
-  console.info '--- flushed ---'
+  request.on 'response', (response) ->
+    console.info '--- flushed ---'
 
 # Log the contents of the hits to stdout.
 log: (hash) ->
@@ -61,7 +62,7 @@ pixel:        fs.readFileSync(__dirname + '/pixel.gif')
 if config.endpoint
   console.info "Flushing hits to $config.endpoint"
   endParams:   url.parse config.endpoint
-  endpoint:    http.createClient endParams.port || 80, endParams.host
+  endpoint:    http.createClient endParams.port || 80, endParams.hostname
   endHeaders:  {host : endParams.host, 'Content-Type': 'application/x-www-form-urlencoded'}
 
 # Don't let exceptions kill the server.
