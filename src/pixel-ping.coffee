@@ -61,7 +61,7 @@ server: http.createServer (req, res) ->
 configPath:   process.argv[2] or (__dirname + '/../config.json')
 config:       JSON.parse fs.readFileSync(configPath).toString()
 pixel:        fs.readFileSync(__dirname + '/pixel.gif')
-jsPath:       url.format({hostname: config.host, port: config.port, path: '/pixel.js', protocol: 'http:'})
+jsPath:       url.format({host: config.host, port: config.port, path: '/pixel.js', protocol: 'http:'})
 js:           fs.readFileSync(__dirname + '/pixel.js', 'utf8').replace("<%= root %>", jsPath)
 jsHeaders:    {'Content-Type': 'text/javascript', 'Content-Length': Buffer.byteLength(js, 'utf8')}
 pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': pixel.length}
