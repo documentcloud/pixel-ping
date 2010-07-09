@@ -46,19 +46,54 @@ server: http.createServer (req, res) ->
   if params.pathname is '/pixel.gif'
     res.writeHead 200, pixelHeaders
     res.end pixel
+  else if params.pathname is '/pixel.js'
+    res.writeHead 200, jsHeaders
+    res.end js
   else
     res.writeHead 404, emptyHeaders
     res.end ''
   record params
 
+
+### Extras
+
+# Grab ejs from underscore.coffee to render the js
+escapeRegExp: (string) -> string.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1')
+
+templateSettings: {
+  start:        '<%'
+  end:          '%>'
+  interpolate:  /<%=(.+?)%>/g
+}
+
+template: (str, data) ->
+  c: templateSettings
+  endMatch: new RegExp("'(?=[^"+c.end.substr(0, 1)+"]*"+escapeRegExp(c.end)+")","g")
+  fn: new Function 'obj',
+    'var p=[],print=function(){p.push.apply(p,arguments);};' +
+    'with(obj){p.push(\'' +
+    str.replace(/[\r\t\n]/g, " ")
+       .replace(endMatch,"\t")
+       .split("'").join("\\'")
+       .split("\t").join("'")
+       .replace(c.interpolate, "',$1,'")
+       .split(c.start).join("');")
+       .split(c.end).join("p.push('") +
+       "');}return p.join('');"
+  if data then fn(data) else fn
+
+
 ### Configuration
 
-# Load the configuration, tracking pixel, and remote endpoint.
+# Load the configuration, tracking pixel, js file, and remote endpoint.
 configPath:   process.argv[2] or (__dirname + '/../config.json')
 config:       JSON.parse fs.readFileSync(configPath).toString()
-pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
-emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
 pixel:        fs.readFileSync(__dirname + '/pixel.gif')
+jsPath:       url.format({hostname: config.host, port: config.port, path: '/pixel.js', protocol: 'http:'})
+js:           template(fs.readFileSync(__dirname + '/pixel.js', 'utf8'), {root: jsPath})
+jsHeaders:    {'Content-Type': 'text/javascript', 'Content-Length': Buffer.byteLength(js, 'utf8')}
+pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': pixel.length}
+emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
 if config.endpoint
   console.info "Flushing hits to $config.endpoint"
   endParams:   url.parse config.endpoint
@@ -75,3 +110,7 @@ process.on 'uncaughtException', (err) ->
 # Start the server listening, and the periodic flush.
 server.listen config.port, config.host
 setInterval flush, config.interval * 1000
+
+
+
+
