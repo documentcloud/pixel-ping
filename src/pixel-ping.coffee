@@ -56,7 +56,7 @@ server: http.createServer (req, res) ->
 # Load the configuration, tracking pixel, and remote endpoint.
 configPath:   process.argv[2] or (__dirname + '/../config.json')
 config:       JSON.parse fs.readFileSync(configPath).toString()
-pixelHeaders: {'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': '43'}
+pixelHeaders: {'Cache-Control': 'private, no-cache, proxy-revalidate', 'Content-Type': 'image/gif', 'Content-Disposition': 'inline', 'Content-Length': pixel.length}
 emptyHeaders: {'Content-Type': 'text/html', 'Content-Length': '0'}
 pixel:        fs.readFileSync(__dirname + '/pixel.gif')
 if config.endpoint
