@@ -1,4 +1,4 @@
-if not window.propublica_tracked
+if not window.pixel_ping_tracked
   loc:       window.location
   titleEl:   document.getElementsByTagName("title").item(0)
   titleText: titleEl.text or ""
@@ -8,4 +8,4 @@ if not window.propublica_tracked
   img.setAttribute 'width', '1'
   img.setAttribute 'height', '1'
   document.body.appendChild img
-  window.propublica_tracked = yes
+  window.pixel_ping_tracked = yes
