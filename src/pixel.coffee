@@ -1,8 +1,9 @@
 if not window.pixel_ping_tracked
   loc:       window.location
   titleEl:   document.getElementsByTagName("title").item(0)
-  titleText: titleEl.text or ""
-  url:       encodeURIComponent "${titleText}|${loc.protocol}//${loc.host}${loc.pathname}"
+  seperator: "|"
+  titleText: titleEl.text.replace(seperator, "") or ""
+  url:       encodeURIComponent "${titleText}${seperator}${loc.protocol}//${loc.host}${loc.pathname}"
   img:       document.createElement 'img'
   img.setAttribute 'src', "<%= root %>/pixel.gif?key=${url}"
   img.setAttribute 'width', '1'
