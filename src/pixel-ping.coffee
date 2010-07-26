@@ -2,7 +2,6 @@
 fs:          require 'fs'
 url:         require 'url'
 http:        require 'http'
-{Buffer}:    require 'buffer'
 querystring: require 'querystring'
 
 #### The Pixel Ping server
