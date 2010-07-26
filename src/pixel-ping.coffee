@@ -85,6 +85,11 @@ if config.endpoint
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 
+# Sending `SIGHUP` to the Pixel Ping process will force a data flush.
+process.on 'SIGHUP', ->
+  console.log 'Got SIGHUP. Forcing a flush:'
+  flush()
+
 # Don't let exceptions kill the server.
 process.on 'uncaughtException', (err) ->
   console.error "Uncaught Exception: ${err}"
