@@ -45,7 +45,7 @@ log = (hash) ->
     console.info "#{hits}:\t#{key}"
 
 # Create a `Server` object. When a request comes in, ensure that it's looking
-# for `pixel.gif`. If it is, serve the pixel and record the request.
+# for `pixel.gif` or `pixel.js`. If the request is for the pixel serve it and record the request.
 server = http.createServer (req, res) ->
   params = url.parse req.url, true
   if params.pathname is '/pixel.gif'
