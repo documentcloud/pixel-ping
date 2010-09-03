@@ -85,7 +85,7 @@ if config.endpoint
 else
   console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
-# Sending `SIGHUP` to the Pixel Ping process will force a data flush.
+# Sending `SIGUSR1` to the Pixel Ping process will force a data flush.
 process.on 'SIGUSR1', ->
   console.log 'Got SIGUSR1. Forcing a flush:'
   flush()
