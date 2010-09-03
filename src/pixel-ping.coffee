@@ -20,7 +20,7 @@ record = (params) ->
 # Serializes the current `store` to JSON, and creates a fresh one. Add a
 # `secret` token to the request object, if configured.
 serialize = ->
-  data  = {json: JSON.stringify(store)}
+  data  = json: JSON.stringify(store)
   store = {}
   data.secret = config.secret if config.secret
   querystring.stringify data
@@ -90,6 +90,8 @@ if config.endpoint
   endHeaders =
     'host':         endParams.host
     'Content-Type': 'application/x-www-form-urlencoded'
+else
+  console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
 # Sending `SIGHUP` to the Pixel Ping process will force a data flush.
 process.on 'SIGHUP', ->
