@@ -1,0 +1,6 @@
+{
+  "port":     "5999",
+  "host":     "localhost",
+  "interval": 60,
+  "endpoint": "http://localhost:6999/endpoint"
+}
