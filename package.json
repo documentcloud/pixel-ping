@@ -1,6 +1,7 @@
 {
   "name":         "pixel-ping",
   "description":  "a minimalist pixel tracker for Node.js",
+  "homepage":     "https://github.com/documentcloud/pixel-ping", 
   "keywords":     ["javascript", "server", "" ],
   "author":       "Jeremy Ashkenas",
   "version":      "0.1.0",
@@ -10,7 +11,11 @@
   }],
   "directories":  {
     "lib": "./lib"
-  }, 
+  },
+  "repository":   {
+    "type": "git",
+    "url":  "http://github.com/document-cloud/pixel-ping.git"
+  },
   "bin":          {
     "pixel-ping": "./bin/pixel-ping"
   }
