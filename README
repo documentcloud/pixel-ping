@@ -48,3 +48,7 @@
   Running "node lib/pixel-ping.js path/to/config.json" will start up the pixel
   server on 127.0.0.1:9187, and every ten minutes (600 seconds), it will flush
   the hits to the provided endpoint.
+  
+  p.s. the with-tracking-js branch includes a javascript file and logic for 
+  tracking pages on other sites.
+  
