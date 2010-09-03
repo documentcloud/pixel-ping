@@ -1,0 +1,22 @@
+{
+  "name":         "pixel-ping",
+  "description":  "A minimalist pixel tracker.",
+  "homepage":     "http://github.com/documentcloud/pixel-ping",
+  "keywords":     ["javascript", "server", "tracking"],
+  "author":       "Jeremy Ashkenas and Jeff Larson",
+  "version":      "0.1.0",
+  "licenses":     [{
+    "type":       "MIT",
+    "url":        "http://github.com/documentcloud/pixel-ping/raw/master/LICENSE"
+  }],
+  "directories":  {
+    "lib": "./lib"
+  },
+  "repository":   {
+    "type": "git",
+    "url":  "http://github.com/document-cloud/pixel-ping.git"
+  },
+  "bin":          {
+    "pixel-ping": "./bin/pixel-ping"
+  }
+}
