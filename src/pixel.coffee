@@ -1,3 +1,8 @@
+# If you're embedding the pixel on other sites where you can't be sure that a DOM 
+# library exists, you can point your users to this branch and js file.
+#
+# Each call to this file collects the window location and title for the request to
+# pixel.gif.
 if not window.pixel_ping_tracked
   loc       = window.location
   titleEl   = document.getElementsByTagName("title").item(0)

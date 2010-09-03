@@ -13,5 +13,5 @@ task 'test', 'Test Pixel Ping', ->
   coffee.stdout.on 'data', log
 
 task 'doc', 'Regenerate Documentation', ->
-  docco = spawn 'docco', ['src/pixel-ping.coffee']
+  docco = spawn 'docco', ['src/pixel-ping.coffee', 'src/pixel.coffee']
   docco.stdout.on 'data', log
