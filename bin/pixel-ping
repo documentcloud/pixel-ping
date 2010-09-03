@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
-var path = require('path'),
-    fs   = require('fs'),
-    lib  = path.join(__dirname, "..", "lib/"),
-    cmd  = "node " + lib + "pixel-ping.js " + (process.argv[2] || "")
-;
+var path = require('path');
+var fs   = require('fs');
+var lib  = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-require("child_process").exec(cmd, function(e, out, err){
-  if(e) console.error(err.read());
-});
-    
+require(lib + '/pixel-ping');
