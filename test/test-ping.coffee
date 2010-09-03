@@ -34,5 +34,5 @@ delay 500, ->
       req.on 'response', (resp) ->
         resp.on 'end', ->
           counter -= 1
-          ping.kill 'SIGHUP' if counter is 0
+          ping.kill 'SIGUSR1' if counter is 0
 
