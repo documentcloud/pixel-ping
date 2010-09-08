@@ -20,7 +20,10 @@
   
   <img src="/pixel.gif?key=13" alt="" />
   
-  The key can be any string -- a document id, the url of the page...
+  The key can be any string -- a document id, the url of the page, etc. You'll
+  probably use a snippet of inline JavaScript to generate the key based on the
+  URL of the page, and other relevant information. For an example of some 
+  JavaScript that generates the key, see the "with-tracking-js" branch.
   
   Pixel ping will store all of the keys and hits in memory, and periodically
   flush them to your application by making an HTTP request. You should make an
@@ -48,7 +51,4 @@
   Running "node lib/pixel-ping.js path/to/config.json" will start up the pixel
   server on 127.0.0.1:9187, and every ten minutes (600 seconds), it will flush
   the hits to the provided endpoint.
-  
-  p.s. the with-tracking-js branch includes a javascript file and logic for 
-  tracking pages on other sites.
   
