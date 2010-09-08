@@ -6,6 +6,9 @@ querystring = require 'querystring'
 
 #### The Pixel Ping server
 
+# Keep in sync with package.json
+VERSION = '0.1.1'
+
 # The in-memory hit `store` is a simple hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
 # seconds.
@@ -60,7 +63,13 @@ server = http.createServer (req, res) ->
 #### Configuration
 
 # Load the configuration and the contents of the tracking pixel.
-configPath  = process.argv[2] or (__dirname + '/../config.json')
+configPath  = process.argv[2]
+if configPath in ['-v', '-version', '--version']
+  console.log "Pixel Ping version #{VERSION}"
+  process.exit 0
+if not configPath
+  console.error "Usage: pixel-ping path/to/config.json"
+  process.exit 0
 config      = JSON.parse fs.readFileSync(configPath).toString()
 pixel       = fs.readFileSync __dirname + '/pixel.gif'
 
