@@ -28,7 +28,7 @@
       padding: 0 2px;
       text-decoration: none;
       background: #55cccc;
-      color: #333300;
+      color: #003333;
     }
     a:active, a:hover {
       color: #000;
@@ -149,9 +149,8 @@
     <h2 id="usage">Usage</h2>
 
     <p>
-      To use Pixel Ping from the client-side, insert an image tag into the page
-      that records your hit, along with the unique key that distinguishes hits
-      for aggregation:
+      To use Pixel Ping in your embedded content, insert an image tag into the page,
+      along with the unique key that distinguishes hits for aggregation:
     </p>
     <pre>
 &lt;img src="/pixel.gif?key=[KEY]" alt="" /&gt;</pre>
@@ -188,7 +187,7 @@ pixel-ping path/to/config.json</pre>
       For security, you may specify an optional "secret" string, which will be passed
       along with each flush from Pixel Ping to your internal API.
     </p>
-    
+
     <pre>
 {
   "host":     "127.0.0.1",
