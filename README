@@ -15,40 +15,5 @@
   It's useful when you want to keep track of page hits, but don't want to inject
   something heavy like Google Analytics. It has no dependencies other than Node.
   
-  To use Pixel Ping, you insert an image tag that records the hit, along with
-  a unique key that is used to distinguish the hits. For example:
-  
-  <img src="/pixel.gif?key=13" alt="" />
-  
-  The key can be any string -- a document id, the url of the page, etc. You'll
-  probably use a snippet of inline JavaScript to generate the key based on the
-  URL of the page, and other relevant information. For an example of some 
-  JavaScript that generates the key, see the "with-tracking-js" branch.
-  
-  Pixel ping will store all of the keys and hits in memory, and periodically
-  flush them to your application by making an HTTP request. You should make an
-  endpoint on your application that can save results from JSON like this:
-  
-  { 
-    "/pages/about.html":      276,
-    "/articles/policy.html":  324
-  }
-  
-  The key being the key you passed to the image tag, and the value being the 
-  number of hits since the previous flush.
-  
-  To configure Pixel Ping, add a "config.json" file in its directory, or supply
-  a path to the configuration file when starting it up. An example of the
-  configuration looks like this:
-  
-  {
-    "host":     "127.0.0.1",
-    "port":     "9187",
-    "interval": 600,
-    "endpoint": "http://www.example.com/internal/save_hits"
-  }
-  
-  Running "node lib/pixel-ping.js path/to/config.json" will start up the pixel
-  server on 127.0.0.1:9187, and every ten minutes (600 seconds), it will flush
-  the hits to the provided endpoint.
-  
+  For installation and usage instructions, see:
+  http://documentcloud.github.com/pixel-ping
