@@ -1,4 +1,4 @@
-# Require core Node.js modules.
+# Require Node.js core modules.
 fs          = require 'fs'
 url         = require 'url'
 http        = require 'http'
@@ -6,10 +6,10 @@ querystring = require 'querystring'
 
 #### The Pixel Ping server
 
-# Keep in sync with package.json
-VERSION = '0.1.1'
+# Keep the version number in sync with `package.json`.
+VERSION = '0.1.2'
 
-# The in-memory hit `store` is a simple hash. We map unique identifiers to the
+# The in-memory hit `store` is just a hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
 # seconds.
 store = {}
@@ -42,7 +42,8 @@ flush = ->
   request.on 'response', (response) ->
     console.info '--- flushed ---'
 
-# Log the contents of the `store` to stdout.
+# Log the contents of the `store` to **stdout**. Happens on every flush, so that
+# there's a record of hits if something goes awry.
 log = (hash) ->
   for key, hits of hash
     console.info "#{hits}:\t#{key}"
@@ -65,12 +66,13 @@ server = http.createServer (req, res) ->
 
 #### Configuration
 
-# Load the configuration and the contents of the tracking pixel.
+# Load the configuration and the contents of the tracking pixel. Handle requests
+# for the version number, and usage information.
 configPath  = process.argv[2]
 if configPath in ['-v', '-version', '--version']
   console.log "Pixel Ping version #{VERSION}"
   process.exit 0
-if not configPath
+if not configPath or (configPath in ['-h', '-help', '--help'])
   console.error "Usage: pixel-ping path/to/config.json"
   process.exit 0
 config      = JSON.parse fs.readFileSync(configPath).toString()
@@ -78,21 +80,25 @@ pixel       = fs.readFileSync __dirname + '/pixel.gif'
 jsPath     = url.format({host: config.host, protocol: 'http:'})
 js         = fs.readFileSync(__dirname + '/pixel.js', 'utf8').replace("<%= root %>", jsPath)
 
+# HTTP headers for the pixel image.
+pixelHeaders =
+  'Cache-Control':        'private, no-cache, proxy-revalidate'
+  'Content-Type':         'image/gif'
+  'Content-Disposition':  'inline'
+  'Content-Length':       pixel.length
 
+# HTTP headers for the javascript file.
 jsHeaders  = 
   'Content-Type':   'text/javascript'
   'Content-Length': Buffer.byteLength(js, 'utf8')
-  
-pixelHeaders = 
-  'Cache-Control':       'private, no-cache, proxy-revalidate'
-  'Content-Type':        'image/gif'
-  'Content-Disposition': 'inline'
-  'Content-Length':      pixel.length
 
+# HTTP headers for the 404 response.
 emptyHeaders = 
   'Content-Type':   'text/html'
   'Content-Length': '0'
 
+# If an `endpoint` has been configured, create an HTTP client connected to it,
+# and log a warning otherwise.
 if config.endpoint
   console.info "Flushing hits to #{config.endpoint}"
   endParams = url.parse config.endpoint
