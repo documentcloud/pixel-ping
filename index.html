@@ -101,13 +101,17 @@
       would like to keep track of specific usage information, and don't want
       to inject something heavy like Google Analytics, perhaps Pixel Ping can help.
     </p>
-
-    <p>Pixel Ping is currently at <b>version 0.1.1</b>.</p>
-
+    
     <p>
-      <i>Pixel Ping is an open-source component of <a href="http://documentcloud.org/">DocumentCloud</a>.</i>
+      <a href="docs/pixel-ping.html">The complete annotated source code</a> 
+      is also available.
     </p>
 
+    <p>
+      <i>Pixel Ping is currently at <b>version 0.1.2</b>, and is an open-source
+      component of <a href="http://www.documentcloud.org/">DocumentCloud</a>.</i>
+    </p>
+    
     <p>
       <a href="#introduction">Introduction</a> |
       <a href="#installation">Installation</a> |
@@ -170,7 +174,8 @@
 
     <p>
       ... where the key is the key you passed to the image tag, and the value
-      is the number of hits since the previous flush.
+      is the number of hits since the previous flush. To force a flush, send a
+      <tt>SIGUSR1</tt> signal to the Pixel Ping process.
     </p>
 
     <p>
@@ -199,7 +204,7 @@ pixel-ping path/to/config.json</pre>
     <h2 id="changes">Change Log</h2>
 
     <p>
-      <b class="header">0.1.1</b><br />
+      <b class="header">0.1.2</b><br />
       Initial release.
     </p>
 
