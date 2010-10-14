@@ -6,7 +6,7 @@
 if not window.pixel_ping_tracked
   loc       = window.location
   titleEl   = document.getElementsByTagName("title").item(0)
-  seperator = "☃"
+  seperator = "|pixel-ping-break|"
   titleText = titleEl.text.replace(/#{"\" + seperator}/g, "") or ""
   url       = encodeURIComponent "#{titleText}#{seperator}#{loc.protocol}//#{loc.host}#{loc.pathname}"
   img       = document.createElement 'img'
