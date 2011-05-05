@@ -7,7 +7,7 @@ querystring = require 'querystring'
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.2'
+VERSION = '0.2.0'
 
 # The in-memory hit `store` is just a hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
@@ -17,8 +17,14 @@ store = {}
 # Record a single incoming hit from the remote pixel.
 record = (params) ->
   return unless key = params.query?.key
-  store[key] or= 0
-  store[key] +=  1
+  type = params.query?.type
+  if type
+    store[type]      or= {}
+    store[type][key] or= 0
+    store[type][key] +=  1
+  else
+    store[key] or= 0
+    store[key] +=  1
 
 # Serializes the current `store` to JSON, and creates a fresh one. Add a
 # `secret` token to the request object, if configured.
@@ -27,7 +33,7 @@ serialize = ->
   store = {}
   data.secret = config.secret if config.secret
   querystring.stringify data
-
+  
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
 # configured, this is a no-op.
@@ -45,8 +51,14 @@ flush = ->
 # Log the contents of the `store` to **stdout**. Happens on every flush, so that
 # there's a record of hits if something goes awry.
 log = (hash) ->
-  for key, hits of hash
-    console.info "#{hits}:\t#{key}"
+  for type, hits of hash
+    if typeof hits == 'object'
+      console.info "# #{type}"
+      for key, type_hits of hits
+        console.info "#{type_hits}:\t#{key}"
+    else
+      key = type
+      console.info "#{hits}:\t#{key}"
 
 # Create a `Server` object. When a request comes in, ensure that it's looking
 # for `pixel.gif`. If it is, serve the pixel and record the request.
