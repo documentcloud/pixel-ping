@@ -24,9 +24,12 @@ record = (params) ->
 # `secret` token to the request object, if configured.
 serialize = ->
   data  = json: JSON.stringify(store)
-  store = {}
   data.secret = config.secret if config.secret
   querystring.stringify data
+
+# Reset the `store`.
+reset = ->
+  store = {}
 
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
@@ -39,6 +42,7 @@ flush = ->
   request = endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
   request.on 'response', (response) ->
+    reset()
     console.info '--- flushed ---'
   request.end()
 
@@ -94,6 +98,7 @@ if config.endpoint
   endParams = url.parse config.endpoint
   endpoint  = http.createClient endParams.port or 80, endParams.hostname
   endpoint.on 'error', (e) ->
+    reset() if config.discard
     console.log "--- cannot connect to endpoint : #{e.message}"
   endHeaders =
     'host':         endParams.host
