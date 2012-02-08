@@ -38,9 +38,9 @@ flush = ->
   endHeaders['Content-Length'] = data.length
   request = endpoint.request 'POST', endParams.pathname, endHeaders
   request.write data
-  request.end()
   request.on 'response', (response) ->
     console.info '--- flushed ---'
+  request.end()
 
 # Log the contents of the `store` to **stdout**. Happens on every flush, so that
 # there's a record of hits if something goes awry.
@@ -93,6 +93,8 @@ if config.endpoint
   console.info "Flushing hits to #{config.endpoint}"
   endParams = url.parse config.endpoint
   endpoint  = http.createClient endParams.port or 80, endParams.hostname
+  endpoint.on 'error', (e) ->
+    console.log "--- cannot connect to endpoint : #{e.message}"
   endHeaders =
     'host':         endParams.host
     'Content-Type': 'application/x-www-form-urlencoded'
