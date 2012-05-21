@@ -32,7 +32,7 @@ serialize = ->
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
 # configured, this is a no-op.
 flush = ->
-  console.log store
+  log store
   return unless config.endpoint
   data = serialize()
   endHeaders['Content-Length'] = data.length
