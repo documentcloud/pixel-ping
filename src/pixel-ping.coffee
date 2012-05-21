@@ -32,7 +32,7 @@ serialize = ->
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
 # configured, this is a no-op.
 flush = ->
-  log store
+  console.log store
   return unless config.endpoint
   data = serialize()
   endHeaders['Content-Length'] = data.length
@@ -88,12 +88,12 @@ pixelHeaders =
   'Content-Length':       pixel.length
 
 # HTTP headers for the javascript file.
-jsHeaders  = 
+jsHeaders  =
   'Content-Type':   'text/javascript'
   'Content-Length': Buffer.byteLength(js, 'utf8')
 
 # HTTP headers for the 404 response.
-emptyHeaders = 
+emptyHeaders =
   'Content-Type':   'text/html'
   'Content-Length': '0'
 
