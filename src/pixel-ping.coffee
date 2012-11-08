@@ -81,7 +81,7 @@ pixel       = fs.readFileSync __dirname + '/pixel.gif'
 
 # HTTP headers for the pixel image.
 pixelHeaders =
-  'Cache-Control':        'private, no-cache, proxy-revalidate'
+  'Cache-Control':        'private, no-cache, proxy-revalidate, max-age=0'
   'Content-Type':         'image/gif'
   'Content-Disposition':  'inline'
   'Content-Length':       pixel.length
