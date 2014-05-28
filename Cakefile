@@ -5,7 +5,7 @@ fs            = require 'fs'
 log = (data) -> print data.toString()
 
 task 'build', 'Build and watch the CoffeeScript source files', ->
-  coffee = spawn 'coffee', ['-cw', '-o', 'lib', 'src']
+  coffee = spawn 'coffee', ['-b', '-cw', '-o', 'lib', 'src']
   coffee.stdout.on 'data', log
 
 task 'test', 'Test Pixel Ping', ->

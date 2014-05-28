@@ -39,11 +39,13 @@ flush = ->
   return unless config.endpoint
   data = serialize()
   endHeaders['Content-Length'] = data.length
-  request = endpoint.request 'POST', endParams.pathname, endHeaders
-  request.write data
-  request.on 'response', (response) ->
+  request = http.request endReqOpts, (response) ->
     reset()
     console.info '--- flushed ---'
+  request.on 'error', (e) ->
+    reset() if config.discard
+    console.log "--- cannot connect to endpoint : #{e.message}"
+  request.write data
   request.end()
 
 # Log the contents of the `store` to **stdout**. Happens on every flush, so that
@@ -96,13 +98,14 @@ emptyHeaders =
 if config.endpoint
   console.info "Flushing hits to #{config.endpoint}"
   endParams = url.parse config.endpoint
-  endpoint  = http.createClient endParams.port or 80, endParams.hostname
-  endpoint.on 'error', (e) ->
-    reset() if config.discard
-    console.log "--- cannot connect to endpoint : #{e.message}"
-  endHeaders =
-    'host':         endParams.host
-    'Content-Type': 'application/x-www-form-urlencoded'
+  endReqOpts =
+    host: endParams.hostname
+    port: endParams.port or 80
+    method: 'POST'
+    path: endParams.pathname
+    headers:
+      'host':         endParams.host
+      'Content-Type': 'application/x-www-form-urlencoded'
 else
   console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
