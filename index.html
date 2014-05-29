@@ -141,7 +141,7 @@
         (npm). If you don't already have these installed, grab the latest. Node
         releases can be found on the <a href="http://www.nodejs.org/#download">download page</a>.
         NPM can be installed with a script:<br />
-        <tt>curl http://npmjs.org/install.sh | sudo sh</tt>
+        <tt>curl https://npmjs.org/install.sh | sudo sh</tt>
       </li>
       <li>
         Install Pixel Ping via NPM:<br />
@@ -175,7 +175,7 @@
     <p>
       ... where the key is the key you passed to the image tag, and the value
       is the number of hits since the previous flush. To force a flush, send a
-      <tt>SIGUSR1</tt> signal to the Pixel Ping process.
+      <tt>SIGUSR2</tt> signal to the Pixel Ping process.
     </p>
 
     <p>
@@ -203,7 +203,12 @@ pixel-ping path/to/config.json</pre>
 }</pre>
 
     <h2 id="changes">Change Log</h2>
-
+    <p>
+      <b class="header">0.1.3</b><br />
+      Changed the signal from USR1 (which is used by node for debugging)
+      to USR2 and upgraded to <tt>http.request</tt> thanks to
+      <a href="https://github.com/gka">gka</a>.
+    </p>
     <p>
       <b class="header">0.1.2</b><br />
       Initial release.
