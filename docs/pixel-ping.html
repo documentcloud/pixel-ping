@@ -1,68 +1,377 @@
-<!DOCTYPE html>  <html> <head>   <title>pixel-ping.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               pixel-ping.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-1">#</a>               </div>               <p>Require Node.js core modules.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">fs          = </span><span class="nx">require</span> <span class="s1">&#39;fs&#39;</span>
-<span class="nv">url         = </span><span class="nx">require</span> <span class="s1">&#39;url&#39;</span>
-<span class="nv">http        = </span><span class="nx">require</span> <span class="s1">&#39;http&#39;</span>
-<span class="nv">querystring = </span><span class="nx">require</span> <span class="s1">&#39;querystring&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-2">#</a>               </div>               <h3>The Pixel Ping server</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-3">#</a>               </div>               <p>Keep the version number in sync with <code>package.json</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">VERSION = </span><span class="s1">&#39;0.1.2&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-4">#</a>               </div>               <p>The in-memory hit <code>store</code> is just a hash. We map unique identifiers to the
-number of hits they receive here, and flush the <code>store</code> every <code>interval</code>
-seconds.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">store = </span><span class="p">{}</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-5">#</a>               </div>               <p>Record a single incoming hit from the remote pixel.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">record = </span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="k">return</span> <span class="nx">unless</span> <span class="nv">key = </span><span class="nx">params</span><span class="p">.</span><span class="nx">query</span><span class="o">?</span><span class="p">.</span><span class="nx">key</span>
-  <span class="nx">store</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">or=</span> <span class="mi">0</span>
-  <span class="nx">store</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">+=</span>  <span class="mi">1</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-6">#</a>               </div>               <p>Serializes the current <code>store</code> to JSON, and creates a fresh one. Add a
-<code>secret</code> token to the request object, if configured.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">serialize = </span><span class="o">-&gt;</span>
-  <span class="nv">data  = </span><span class="nx">json</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span>
-  <span class="nv">store = </span><span class="p">{}</span>
-  <span class="nv">data.secret = </span><span class="nx">config</span><span class="p">.</span><span class="nx">secret</span> <span class="k">if</span> <span class="nx">config</span><span class="p">.</span><span class="nx">secret</span>
-  <span class="nx">querystring</span><span class="p">.</span><span class="nx">stringify</span> <span class="nx">data</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-7">#</a>               </div>               <p>Flushes the <code>store</code> to be saved by an external API. The contents of the store
-are sent to the configured <code>endpoint</code> URL via HTTP POST. If no <code>endpoint</code> is
-configured, this is a no-op.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">flush = </span><span class="o">-&gt;</span>
-  <span class="nx">log</span> <span class="nx">store</span>
-  <span class="k">return</span> <span class="nx">unless</span> <span class="nx">config</span><span class="p">.</span><span class="nx">endpoint</span>
-  <span class="nv">data = </span><span class="nx">serialize</span><span class="p">()</span>
-  <span class="nx">endHeaders</span><span class="p">[</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span>
-  <span class="nv">request = </span><span class="nx">endpoint</span><span class="p">.</span><span class="nx">request</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="nx">endParams</span><span class="p">.</span><span class="nx">pathname</span><span class="p">,</span> <span class="nx">endHeaders</span>
-  <span class="nx">request</span><span class="p">.</span><span class="nx">write</span> <span class="nx">data</span>
-  <span class="nx">request</span><span class="p">.</span><span class="nx">end</span><span class="p">()</span>
-  <span class="nx">request</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">info</span> <span class="s1">&#39;--- flushed ---&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-8">#</a>               </div>               <p>Log the contents of the <code>store</code> to <strong>stdout</strong>. Happens on every flush, so that
-there's a record of hits if something goes awry.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">log = </span><span class="p">(</span><span class="nx">hash</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">hits</span> <span class="k">of</span> <span class="nx">hash</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">info</span> <span class="s2">&quot;#{hits}:\t#{key}&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-9">#</a>               </div>               <p>Create a <code>Server</code> object. When a request comes in, ensure that it's looking
-for <code>pixel.gif</code>. If it is, serve the pixel and record the request.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">server = </span><span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="nv">params = </span><span class="nx">url</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="kc">true</span>
-  <span class="k">if</span> <span class="nx">params</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">is</span> <span class="s1">&#39;/pixel.gif&#39;</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">pixelHeaders</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span> <span class="nx">pixel</span>
-    <span class="nx">record</span> <span class="nx">params</span>
-  <span class="k">else</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span> <span class="mi">404</span><span class="p">,</span> <span class="nx">emptyHeaders</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span> <span class="s1">&#39;&#39;</span>
-  <span class="kc">null</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-10">#</a>               </div>               <h3>Configuration</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-11">#</a>               </div>               <p>Load the configuration and the contents of the tracking pixel. Handle requests
-for the version number, and usage information.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">configPath  = </span><span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-<span class="k">if</span> <span class="nx">configPath</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;-version&#39;</span><span class="p">,</span> <span class="s1">&#39;--version&#39;</span><span class="p">]</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;Pixel Ping version #{VERSION}&quot;</span>
-  <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="mi">0</span>
-<span class="k">if</span> <span class="o">not</span> <span class="nx">configPath</span> <span class="o">or</span> <span class="p">(</span><span class="nx">configPath</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;-h&#39;</span><span class="p">,</span> <span class="s1">&#39;-help&#39;</span><span class="p">,</span> <span class="s1">&#39;--help&#39;</span><span class="p">])</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="s2">&quot;Usage: pixel-ping path/to/config.json&quot;</span>
-  <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="mi">0</span>
-<span class="nv">config      = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">configPath</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
-<span class="nv">pixel       = </span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/pixel.gif&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-12">#</a>               </div>               <p>HTTP headers for the pixel image.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">pixelHeaders =</span>
-  <span class="s1">&#39;Cache-Control&#39;</span><span class="o">:</span>        <span class="s1">&#39;private, no-cache, proxy-revalidate&#39;</span>
-  <span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span>         <span class="s1">&#39;image/gif&#39;</span>
-  <span class="s1">&#39;Content-Disposition&#39;</span><span class="o">:</span>  <span class="s1">&#39;inline&#39;</span>
-  <span class="s1">&#39;Content-Length&#39;</span><span class="o">:</span>       <span class="nx">pixel</span><span class="p">.</span><span class="nx">length</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-13">#</a>               </div>               <p>HTTP headers for the 404 response.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">emptyHeaders =</span>
-  <span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span>   <span class="s1">&#39;text/html&#39;</span>
-  <span class="s1">&#39;Content-Length&#39;</span><span class="o">:</span> <span class="s1">&#39;0&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-14">#</a>               </div>               <p>If an <code>endpoint</code> has been configured, create an HTTP client connected to it,
-and log a warning otherwise.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="nx">config</span><span class="p">.</span><span class="nx">endpoint</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">info</span> <span class="s2">&quot;Flushing hits to #{config.endpoint}&quot;</span>
-  <span class="nv">endParams = </span><span class="nx">url</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">config</span><span class="p">.</span><span class="nx">endpoint</span>
-  <span class="nv">endpoint  = </span><span class="nx">http</span><span class="p">.</span><span class="nx">createClient</span> <span class="nx">endParams</span><span class="p">.</span><span class="nx">port</span> <span class="o">or</span> <span class="mi">80</span><span class="p">,</span> <span class="nx">endParams</span><span class="p">.</span><span class="nx">hostname</span>
-  <span class="nv">endHeaders =</span>
-    <span class="s1">&#39;host&#39;</span><span class="o">:</span>         <span class="nx">endParams</span><span class="p">.</span><span class="nx">host</span>
-    <span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span>
-<span class="k">else</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span> <span class="s2">&quot;No endpoint set. Hits won&#39;t be flushed, add \&quot;endpoint\&quot; to #{configPath}.&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-15">#</a>               </div>               <p>Sending <code>SIGUSR1</code> to the Pixel Ping process will force a data flush.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">process</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;SIGUSR1&#39;</span><span class="p">,</span> <span class="o">-&gt;</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s1">&#39;Got SIGUSR1. Forcing a flush:&#39;</span>
-  <span class="nx">flush</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-16">#</a>               </div>               <p>Don't let exceptions kill the server.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">process</span><span class="p">.</span><span class="kc">on</span> <span class="s1">&#39;uncaughtException&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="o">-&gt;</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="s2">&quot;Uncaught Exception: #{err}&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-17">#</a>               </div>               <h3>Startup</h3>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-18">#</a>               </div>               <p>Start the server listening for pixel hits, and begin the periodic data flush.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span> <span class="nx">config</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">host</span>
-<span class="nx">setInterval</span> <span class="nx">flush</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">interval</span> <span class="o">*</span> <span class="mi">1000</span>
+<!DOCTYPE html>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+<html>
+<head>
+  <title>pixel-ping.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>pixel-ping.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>Require Node.js core modules.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>fs          = <span class="hljs-built_in">require</span> <span class="hljs-string">'fs'</span>
+url         = <span class="hljs-built_in">require</span> <span class="hljs-string">'url'</span>
+http        = <span class="hljs-built_in">require</span> <span class="hljs-string">'http'</span>
+querystring = <span class="hljs-built_in">require</span> <span class="hljs-string">'querystring'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h3 id="the-pixel-ping-server">The Pixel Ping server</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Keep the version number in sync with <code>package.json</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.3'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>The in-memory hit <code>store</code> is just a hash. We map unique identifiers to the
+number of hits they receive here, and flush the <code>store</code> every <code>interval</code>
+seconds.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>store = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Record a single incoming hit from the remote pixel.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">record</span> = <span class="hljs-params">(params)</span> -&gt;</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> key = params.query?.key
+  store[key] <span class="hljs-keyword">or</span>= <span class="hljs-number">0</span>
+  store[key] +=  <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Serializes the current <code>store</code> to JSON, and creates a fresh one. Add a
+<code>secret</code> token to the request object, if configured.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">serialize</span> = -&gt;</span>
+  data  = <span class="hljs-attribute">json</span>: JSON.stringify(store)
+  data.secret = config.secret <span class="hljs-keyword">if</span> config.secret
+  querystring.stringify data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Reset the <code>store</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">reset</span> = -&gt;</span>
+  store = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Flushes the <code>store</code> to be saved by an external API. The contents of the store
+are sent to the configured <code>endpoint</code> URL via HTTP POST. If no <code>endpoint</code> is
+configured, this is a no-op.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">flush</span> = -&gt;</span>
+  log store
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> config.endpoint
+  data = serialize()
+  endReqOpts[<span class="hljs-string">'headers'</span>][<span class="hljs-string">'Content-Length'</span>] = data.length
+  request = http.request endReqOpts, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
+    reset()
+    <span class="hljs-built_in">console</span>.info <span class="hljs-string">'--- flushed ---'</span>
+  request.<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-params">(e)</span> -&gt;</span>
+    reset() <span class="hljs-keyword">if</span> config.discard
+    <span class="hljs-built_in">console</span>.log <span class="hljs-string">"--- cannot connect to endpoint : <span class="hljs-subst">#{e.message}</span>"</span>
+  request.write data
+  request.end()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Log the contents of the <code>store</code> to <strong>stdout</strong>. Happens on every flush, so that
+there’s a record of hits if something goes awry.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">log</span> = <span class="hljs-params">(hash)</span> -&gt;</span>
+  <span class="hljs-keyword">for</span> key, hits <span class="hljs-keyword">of</span> hash
+    <span class="hljs-built_in">console</span>.info <span class="hljs-string">"<span class="hljs-subst">#{hits}</span>:\t<span class="hljs-subst">#{key}</span>"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Create a <code>Server</code> object. When a request comes in, ensure that it’s looking
+for <code>pixel.gif</code>. If it is, serve the pixel and record the request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>server = http.createServer <span class="hljs-function"><span class="hljs-params">(req, res)</span> -&gt;</span>
+  params = url.parse req.url, <span class="hljs-literal">true</span>
+  <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.gif'</span>
+    res.writeHead <span class="hljs-number">200</span>, pixelHeaders
+    res.end pixel
+    record params
+  <span class="hljs-keyword">else</span>
+    res.writeHead <span class="hljs-number">404</span>, emptyHeaders
+    res.end <span class="hljs-string">''</span>
+  <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h3 id="configuration">Configuration</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Load the configuration and the contents of the tracking pixel. Handle requests
+for the version number, and usage information.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>configPath  = process.argv[<span class="hljs-number">2</span>]
+<span class="hljs-keyword">if</span> configPath <span class="hljs-keyword">in</span> [<span class="hljs-string">'-v'</span>, <span class="hljs-string">'-version'</span>, <span class="hljs-string">'--version'</span>]
+  <span class="hljs-built_in">console</span>.log <span class="hljs-string">"Pixel Ping version <span class="hljs-subst">#{VERSION}</span>"</span>
+  process.exit <span class="hljs-number">0</span>
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> configPath <span class="hljs-keyword">or</span> (configPath <span class="hljs-keyword">in</span> [<span class="hljs-string">'-h'</span>, <span class="hljs-string">'-help'</span>, <span class="hljs-string">'--help'</span>])
+  <span class="hljs-built_in">console</span>.error <span class="hljs-string">"Usage: pixel-ping path/to/config.json"</span>
+  process.exit <span class="hljs-number">0</span>
+config      = JSON.parse fs.readFileSync(configPath).toString()
+pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>HTTP headers for the pixel image.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>pixelHeaders =
+  <span class="hljs-string">'Cache-Control'</span>:        <span class="hljs-string">'private, no-cache, proxy-revalidate, max-age=0'</span>
+  <span class="hljs-string">'Content-Type'</span>:         <span class="hljs-string">'image/gif'</span>
+  <span class="hljs-string">'Content-Disposition'</span>:  <span class="hljs-string">'inline'</span>
+  <span class="hljs-string">'Content-Length'</span>:       pixel.length</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>HTTP headers for the 404 response.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>emptyHeaders =
+  <span class="hljs-string">'Content-Type'</span>:   <span class="hljs-string">'text/html'</span>
+  <span class="hljs-string">'Content-Length'</span>: <span class="hljs-string">'0'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>If an <code>endpoint</code> has been configured, create an HTTP client connected to it,
+and log a warning otherwise.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> config.endpoint
+  <span class="hljs-built_in">console</span>.info <span class="hljs-string">"Flushing hits to <span class="hljs-subst">#{config.endpoint}</span>"</span>
+  endParams = url.parse config.endpoint
+  endReqOpts =
+    <span class="hljs-attribute">host</span>: endParams.hostname
+    <span class="hljs-attribute">port</span>: endParams.port <span class="hljs-keyword">or</span> <span class="hljs-number">80</span>
+    <span class="hljs-attribute">method</span>: <span class="hljs-string">'POST'</span>
+    <span class="hljs-attribute">path</span>: endParams.pathname
+    <span class="hljs-attribute">headers</span>:
+      <span class="hljs-string">'host'</span>:         endParams.host
+      <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/x-www-form-urlencoded'</span>
+<span class="hljs-keyword">else</span>
+  <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"No endpoint set. Hits won't be flushed, add \"endpoint\" to <span class="hljs-subst">#{configPath}</span>."</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Sending <code>SIGUSR2</code> to the Pixel Ping process will force a data flush.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'SIGUSR2'</span>,<span class="hljs-function"> -&gt;</span>
+  <span class="hljs-built_in">console</span>.log <span class="hljs-string">'Got SIGUSR2. Forcing a flush:'</span>
+  flush()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Don’t let exceptions kill the server.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'uncaughtException'</span>, <span class="hljs-function"><span class="hljs-params">(err)</span> -&gt;</span>
+  <span class="hljs-built_in">console</span>.error <span class="hljs-string">"Uncaught Exception: <span class="hljs-subst">#{err}</span>"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <h3 id="startup">Startup</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Start the server listening for pixel hits, and begin the periodic data flush.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>server.listen config.port, config.host
+setInterval flush, config.interval * <span class="hljs-number">1000</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
