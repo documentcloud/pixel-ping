@@ -7,7 +7,7 @@ querystring = require 'querystring'
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 # The in-memory hit `store` is just a hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
@@ -38,7 +38,7 @@ flush = ->
   log store
   return unless config.endpoint
   data = serialize()
-  endHeaders['Content-Length'] = data.length
+  endReqOpts['headers']['Content-Length'] = data.length
   request = http.request endReqOpts, (response) ->
     reset()
     console.info '--- flushed ---'
@@ -109,9 +109,9 @@ if config.endpoint
 else
   console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
-# Sending `SIGUSR1` to the Pixel Ping process will force a data flush.
-process.on 'SIGUSR1', ->
-  console.log 'Got SIGUSR1. Forcing a flush:'
+# Sending `SIGUSR2` to the Pixel Ping process will force a data flush.
+process.on 'SIGUSR2', ->
+  console.log 'Got SIGUSR2. Forcing a flush:'
   flush()
 
 # Don't let exceptions kill the server.
