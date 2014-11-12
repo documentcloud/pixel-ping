@@ -2,6 +2,6 @@
   "port":     "9187",
   "host":     "localhost",
   "interval": 60,
-  "endpoint": "http://www.example.com/internal/save_hits",
+  "endpoint": "http://localhost:8080/",
   "discard": true
 }

@@ -3,6 +3,7 @@ fs          = require 'fs'
 url         = require 'url'
 http        = require 'http'
 querystring = require 'querystring'
+session     = require('sesh/lib/core').magicSession()
 
 #### The Pixel Ping server
 
@@ -57,9 +58,11 @@ log = (hash) ->
 # Create a `Server` object. When a request comes in, ensure that it's looking
 # for `pixel.gif`. If it is, serve the pixel and record the request.
 server = http.createServer (req, res) ->
+  req.url = req.url + '?key=' + req.session.id
   params = url.parse req.url, true
   if params.pathname is '/pixel.gif'
     res.writeHead 200, pixelHeaders
+    # res.write('request.session: \n' + JSON.stringify(req.session, 2, true))
     res.end pixel
     record params
   else

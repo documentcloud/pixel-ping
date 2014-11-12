@@ -1,0 +1,126 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', '-g', 'sesh' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 verbose cache add [ 'sesh', null ]
+5 verbose cache add name=undefined spec="sesh" args=["sesh",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'sesh',
+6 verbose parsed url   path: 'sesh',
+6 verbose parsed url   href: 'sesh' }
+7 silly lockFile ec1aeb1e-sesh sesh
+8 verbose lock sesh /Users/djohnson/.npm/ec1aeb1e-sesh.lock
+9 silly lockFile ec1aeb1e-sesh sesh
+10 silly lockFile ec1aeb1e-sesh sesh
+11 verbose addNamed [ 'sesh', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile 6b2fd9b1-sesh sesh@
+14 verbose lock sesh@ /Users/djohnson/.npm/6b2fd9b1-sesh.lock
+15 silly addNameRange { name: 'sesh', range: '*', hasData: false }
+16 verbose request where is /sesh
+17 verbose request registry https://registry.npmjs.org/
+18 verbose request id 790b11aa757892d2
+19 verbose url raw /sesh
+20 verbose url resolving [ 'https://registry.npmjs.org/', './sesh' ]
+21 verbose url resolved https://registry.npmjs.org/sesh
+22 verbose request where is https://registry.npmjs.org/sesh
+23 info trying registry request attempt 1 at 11:15:09
+24 verbose etag "618UMIDTDCQXN7YWBZX8KSJ5K"
+25 http GET https://registry.npmjs.org/sesh
+26 http 304 https://registry.npmjs.org/sesh
+27 silly registry.get cb [ 304,
+27 silly registry.get   { date: 'Fri, 07 Nov 2014 17:15:06 GMT',
+27 silly registry.get     server: 'Apache',
+27 silly registry.get     via: '1.1 varnish',
+27 silly registry.get     'last-modified': 'Fri, 07 Nov 2014 17:14:50 GMT',
+27 silly registry.get     'cache-control': 'max-age=60',
+27 silly registry.get     etag: '"618UMIDTDCQXN7YWBZX8KSJ5K"',
+27 silly registry.get     age: '16',
+27 silly registry.get     'x-served-by': 'cache-jfk1031-JFK',
+27 silly registry.get     'x-cache': 'HIT',
+27 silly registry.get     'x-cache-hits': '1',
+27 silly registry.get     'x-timer': 'S1415380506.654319,VS0,VE0',
+27 silly registry.get     vary: 'Accept',
+27 silly registry.get     'content-length': '0',
+27 silly registry.get     'keep-alive': 'timeout=10, max=50',
+27 silly registry.get     connection: 'Keep-Alive' } ]
+28 verbose etag https://registry.npmjs.org/sesh from cache
+29 silly addNameRange number 2 { name: 'sesh', range: '*', hasData: true }
+30 silly addNameRange versions [ 'sesh', [ '0.1.0' ] ]
+31 verbose addNamed [ 'sesh', '0.1.0' ]
+32 verbose addNamed [ '0.1.0', '0.1.0' ]
+33 silly lockFile 11c801c3-sesh-0-1-0 sesh@0.1.0
+34 verbose lock sesh@0.1.0 /Users/djohnson/.npm/11c801c3-sesh-0-1-0.lock
+35 silly lockFile 11c801c3-sesh-0-1-0 sesh@0.1.0
+36 silly lockFile 11c801c3-sesh-0-1-0 sesh@0.1.0
+37 silly lockFile 6b2fd9b1-sesh sesh@
+38 silly lockFile 6b2fd9b1-sesh sesh@
+39 silly resolved [ { name: 'sesh',
+39 silly resolved     description: 'super simple session middleware for node.js, even has optional \'magic\' sessions which monkey patch the httpServer with one line!',
+39 silly resolved     version: '0.1.0',
+39 silly resolved     author: { name: 'Marak Squires', email: 'marak.squires@gmail.com' },
+39 silly resolved     repository: { type: 'git', url: 'http://github.com/marak/session.js.git' },
+39 silly resolved     keywords: [ 'sessions', 'cookies', 'middleware', 'session' ],
+39 silly resolved     dependencies: { response: '>= 0.1.0' },
+39 silly resolved     main: './lib/core',
+39 silly resolved     engines: { node: '>= 0.2.0' },
+39 silly resolved     _id: 'sesh@0.1.0',
+39 silly resolved     _engineSupported: true,
+39 silly resolved     _npmVersion: '0.2.13-2',
+39 silly resolved     _nodeVersion: 'v0.3.1',
+39 silly resolved     dist:
+39 silly resolved      { shasum: 'c6a6c2ac01009771647cd6c2c79d9caf32642db2',
+39 silly resolved        tarball: 'http://registry.npmjs.org/sesh/-/sesh-0.1.0.tgz' },
+39 silly resolved     directories: {},
+39 silly resolved     _shasum: 'c6a6c2ac01009771647cd6c2c79d9caf32642db2',
+39 silly resolved     _from: 'sesh@',
+39 silly resolved     _resolved: 'https://registry.npmjs.org/sesh/-/sesh-0.1.0.tgz',
+39 silly resolved     bugs: { url: 'https://github.com/marak/session.js/issues' },
+39 silly resolved     readme: 'ERROR: No README data found!',
+39 silly resolved     homepage: 'https://github.com/marak/session.js' } ]
+40 info install sesh@0.1.0 into /usr/local/lib
+41 info installOne sesh@0.1.0
+42 verbose lib/node_modules/sesh unbuild
+43 verbose tar unpack /Users/djohnson/.npm/sesh/0.1.0/package.tgz
+44 silly lockFile 50345291--usr-local-lib-node-modules-sesh tar:///usr/local/lib/node_modules/sesh
+45 verbose lock tar:///usr/local/lib/node_modules/sesh /Users/djohnson/.npm/50345291--usr-local-lib-node-modules-sesh.lock
+46 silly lockFile 351c9789-hnson-npm-sesh-0-1-0-package-tgz tar:///Users/djohnson/.npm/sesh/0.1.0/package.tgz
+47 verbose lock tar:///Users/djohnson/.npm/sesh/0.1.0/package.tgz /Users/djohnson/.npm/351c9789-hnson-npm-sesh-0-1-0-package-tgz.lock
+48 silly gunzTarPerm modes [ '755', '644' ]
+49 error Error: EACCES, mkdir '/usr/local/lib/node_modules/sesh'
+49 error  { [Error: EACCES, mkdir '/usr/local/lib/node_modules/sesh']
+49 error   errno: 3,
+49 error   code: 'EACCES',
+49 error   path: '/usr/local/lib/node_modules/sesh',
+49 error   fstream_type: 'Directory',
+49 error   fstream_path: '/usr/local/lib/node_modules/sesh',
+49 error   fstream_class: 'DirWriter',
+49 error   fstream_stack:
+49 error    [ '/usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23',
+49 error      '/usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53',
+49 error      'Object.oncomplete (fs.js:107:15)' ] }
+50 error Please try running this command again as root/Administrator.
+51 error System Darwin 14.0.0
+52 error command "node" "/usr/local/bin/npm" "install" "-g" "sesh"
+53 error cwd /Users/djohnson/apps/pixel-ping
+54 error node -v v0.10.33
+55 error npm -v 1.4.28
+56 error path /usr/local/lib/node_modules/sesh
+57 error fstream_path /usr/local/lib/node_modules/sesh
+58 error fstream_type Directory
+59 error fstream_class DirWriter
+60 error code EACCES
+61 error errno 3
+62 error stack Error: EACCES, mkdir '/usr/local/lib/node_modules/sesh'
+63 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/fstream/lib/dir-writer.js:36:23
+63 error fstream_stack /usr/local/lib/node_modules/npm/node_modules/mkdirp/index.js:46:53
+63 error fstream_stack Object.oncomplete (fs.js:107:15)
+64 verbose exit [ 3, true ]
