@@ -11,6 +11,27 @@
   <div id="container">
     <div id="background"></div>
     
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="pixel-ping.html">
+                pixel-ping.coffee
+              </a>
+            
+              
+              <a class="source" href="pixel.html">
+                pixel.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
     <ul class="sections">
         
           <li id="title">
@@ -191,16 +212,19 @@ there’s a record of hits if something goes awry.</p>
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Create a <code>Server</code> object. When a request comes in, ensure that it’s looking
-for <code>pixel.gif</code>. If it is, serve the pixel and record the request.</p>
+for <code>pixel.gif</code> or <code>pixel.js</code>. If the request is for the pixel serve it and record the request.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>server = http.createServer <span class="hljs-function"><span class="hljs-params">(req, res)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>server = http.createServer (req, res) -&gt;
   params = url.parse req.url, <span class="hljs-literal">true</span>
   <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.gif'</span>
     res.writeHead <span class="hljs-number">200</span>, pixelHeaders
     res.end pixel
     record params
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.js'</span>
+    res.writeHead <span class="hljs-number">200</span>, jsHeaders
+    res.end js
   <span class="hljs-keyword">else</span>
     res.writeHead <span class="hljs-number">404</span>, emptyHeaders
     res.end <span class="hljs-string">''</span>
@@ -241,7 +265,9 @@ for the version number, and usage information.</p>
   <span class="hljs-built_in">console</span>.error <span class="hljs-string">"Usage: pixel-ping path/to/config.json"</span>
   process.exit <span class="hljs-number">0</span>
 config      = JSON.parse fs.readFileSync(configPath).toString()
-pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'</span></pre></div></div>
+pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'</span>
+jsPath     = url.format({<span class="hljs-attribute">host</span>: config.host, <span class="hljs-attribute">protocol</span>: <span class="hljs-string">'http:'</span>})
+js         = fs.readFileSync(__dirname + <span class="hljs-string">'/pixel.js'</span>, <span class="hljs-string">'utf8'</span>).replace(<span class="hljs-string">"&lt;%= root %&gt;"</span>, jsPath)</pre></div></div>
             
         </li>
         
@@ -271,6 +297,23 @@ pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
+              <p>HTTP headers for the javascript file.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>jsHeaders  =
+  <span class="hljs-string">'Content-Type'</span>:   <span class="hljs-string">'text/javascript'</span>
+  <span class="hljs-string">'Content-Length'</span>: Buffer.byteLength(js, <span class="hljs-string">'utf8'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
               <p>HTTP headers for the 404 response.</p>
 
             </div>
@@ -282,11 +325,11 @@ pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>If an <code>endpoint</code> has been configured, create an HTTP client connected to it,
 and log a warning otherwise.</p>
@@ -310,28 +353,28 @@ and log a warning otherwise.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Sending <code>SIGUSR2</code> to the Pixel Ping process will force a data flush.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'SIGUSR2'</span>,<span class="hljs-function"> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'SIGUSR2'</span>, <span class="hljs-function">-&gt;</span>
   <span class="hljs-built_in">console</span>.log <span class="hljs-string">'Got SIGUSR2. Forcing a flush:'</span>
   flush()</pre></div></div>
             
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Don’t let exceptions kill the server.</p>
 
@@ -343,11 +386,11 @@ and log a warning otherwise.</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <h3 id="startup">Startup</h3>
 
@@ -356,11 +399,11 @@ and log a warning otherwise.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Start the server listening for pixel hits, and begin the periodic data flush.</p>
 
