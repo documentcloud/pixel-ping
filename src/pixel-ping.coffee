@@ -81,10 +81,10 @@ if configPath in ['-v', '-version', '--version']
 if not configPath or (configPath in ['-h', '-help', '--help'])
   console.error "Usage: pixel-ping path/to/config.json"
   process.exit 0
-config      = JSON.parse fs.readFileSync(configPath).toString()
-pixel       = fs.readFileSync __dirname + '/pixel.gif'
-jsPath     = url.format({host: config.host, protocol: 'http:'})
-js         = fs.readFileSync(__dirname + '/pixel.js', 'utf8').replace("<%= root %>", jsPath)
+config = JSON.parse fs.readFileSync(configPath).toString()
+pixel  = fs.readFileSync __dirname + '/pixel.gif'
+jsPath = url.format({host: config.host, protocol: 'http:'})
+js     = fs.readFileSync(__dirname + '/pixel.js', 'utf8').replace("<%= root %>", jsPath)
 
 # HTTP headers for the pixel image.
 pixelHeaders =
