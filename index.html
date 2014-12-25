@@ -27,12 +27,12 @@
     a, a:visited {
       padding: 0 2px;
       text-decoration: none;
-      background: #55cccc;
+      background: #77dddd;
       color: #003333;
     }
     a:active, a:hover {
       color: #000;
-      background: #44dddd;
+      background: #00cccc;
     }
     h1, h2, h3, h4, h5, h6 {
       margin-top: 40px;
@@ -101,9 +101,9 @@
       would like to keep track of specific usage information, and don't want
       to inject something heavy like Google Analytics, perhaps Pixel Ping can help.
     </p>
-    
+
     <p>
-      <a href="docs/pixel-ping.html">The complete annotated source code</a> 
+      <a href="docs/pixel-ping.html">The complete annotated source code</a>
       is also available.
     </p>
 
@@ -111,7 +111,7 @@
       <i>Pixel Ping is currently at <b>version 0.1.2</b>, and is an open-source
       component of <a href="http://www.documentcloud.org/">DocumentCloud</a>.</i>
     </p>
-    
+
     <p>
       <a href="#introduction">Introduction</a> |
       <a href="#installation">Installation</a> |
@@ -141,7 +141,7 @@
         (npm). If you don't already have these installed, grab the latest. Node
         releases can be found on the <a href="http://www.nodejs.org/#download">download page</a>.
         NPM can be installed with a script:<br />
-        <tt>curl http://npmjs.org/install.sh | sudo sh</tt>
+        <tt>curl https://npmjs.org/install.sh | sudo sh</tt>
       </li>
       <li>
         Install Pixel Ping via NPM:<br />
@@ -175,7 +175,7 @@
     <p>
       ... where the key is the key you passed to the image tag, and the value
       is the number of hits since the previous flush. To force a flush, send a
-      <tt>SIGUSR1</tt> signal to the Pixel Ping process.
+      <tt>SIGUSR2</tt> signal to the Pixel Ping process.
     </p>
 
     <p>
@@ -198,11 +198,17 @@ pixel-ping path/to/config.json</pre>
   "host":     "127.0.0.1",
   "port":     "9187",
   "interval": 600,
-  "endpoint": "http://www.example.com/internal/save_hits"
+  "endpoint": "http://www.example.com/internal/save_hits",
+  "discard": false
 }</pre>
 
     <h2 id="changes">Change Log</h2>
-
+    <p>
+      <b class="header">0.1.3</b><br />
+      Changed the signal from USR1 (which is used by node for debugging)
+      to USR2 and upgraded to <tt>http.request</tt> thanks to
+      <a href="https://github.com/gka">gka</a>.
+    </p>
     <p>
       <b class="header">0.1.2</b><br />
       Initial release.

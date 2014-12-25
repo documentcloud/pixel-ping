@@ -7,7 +7,7 @@ querystring = require 'querystring'
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 # The in-memory hit `store` is just a hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
@@ -24,9 +24,12 @@ record = (params) ->
 # `secret` token to the request object, if configured.
 serialize = ->
   data  = json: JSON.stringify(store)
-  store = {}
   data.secret = config.secret if config.secret
   querystring.stringify data
+
+# Reset the `store`.
+reset = ->
+  store = {}
 
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
@@ -35,12 +38,15 @@ flush = ->
   log store
   return unless config.endpoint
   data = serialize()
-  endHeaders['Content-Length'] = data.length
-  request = endpoint.request 'POST', endParams.pathname, endHeaders
+  endReqOpts['headers']['Content-Length'] = data.length
+  request = http.request endReqOpts, (response) ->
+    reset()
+    console.info '--- flushed ---'
+  request.on 'error', (e) ->
+    reset() if config.discard
+    console.log "--- cannot connect to endpoint : #{e.message}"
   request.write data
   request.end()
-  request.on 'response', (response) ->
-    console.info '--- flushed ---'
 
 # Log the contents of the `store` to **stdout**. Happens on every flush, so that
 # there's a record of hits if something goes awry.
@@ -82,7 +88,7 @@ js         = fs.readFileSync(__dirname + '/pixel.js', 'utf8').replace("<%= root 
 
 # HTTP headers for the pixel image.
 pixelHeaders =
-  'Cache-Control':        'private, no-cache, proxy-revalidate'
+  'Cache-Control':        'private, no-cache, proxy-revalidate, max-age=0'
   'Content-Type':         'image/gif'
   'Content-Disposition':  'inline'
   'Content-Length':       pixel.length
@@ -102,16 +108,20 @@ emptyHeaders =
 if config.endpoint
   console.info "Flushing hits to #{config.endpoint}"
   endParams = url.parse config.endpoint
-  endpoint  = http.createClient endParams.port or 80, endParams.hostname
-  endHeaders =
-    'host':         endParams.host
-    'Content-Type': 'application/x-www-form-urlencoded'
+  endReqOpts =
+    host: endParams.hostname
+    port: endParams.port or 80
+    method: 'POST'
+    path: endParams.pathname
+    headers:
+      'host':         endParams.host
+      'Content-Type': 'application/x-www-form-urlencoded'
 else
   console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
-# Sending `SIGUSR1` to the Pixel Ping process will force a data flush.
-process.on 'SIGUSR1', ->
-  console.log 'Got SIGUSR1. Forcing a flush:'
+# Sending `SIGUSR2` to the Pixel Ping process will force a data flush.
+process.on 'SIGUSR2', ->
+  console.log 'Got SIGUSR2. Forcing a flush:'
   flush()
 
 # Don't let exceptions kill the server.

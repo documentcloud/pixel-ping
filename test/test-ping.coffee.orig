@@ -9,10 +9,17 @@ server = http.createServer (req, res) ->
     req.on 'data', (chunk) ->
       data = querystring.parse chunk.toString()
       hits = JSON.parse data.json
+<<<<<<< HEAD
+      if hits.one is 1 and hits.two is 2 and hits.three is 3
+        console.log 'Test Succeeded'
+      else
+        console.log 'Test Failed ' + inspect hits
+=======
       if hits.one is 1 and hits.two is 2
         console.log 'Test Succeeded'
       else
         console.log 'Test Failed ', hits
+>>>>>>> master
       ping.kill 'SIGINT'
       process.exit 0
     res.end()
@@ -25,6 +32,17 @@ ping = spawn 'node', ['bin/pixel-ping', 'test/config.json']
 delay = (time, func) -> setTimeout func, time
 
 delay 500, ->
+<<<<<<< HEAD
+  counter = 6
+  for key, i in ['zero', 'one', 'two', 'three']
+    for time in [0...i]
+      req = http.get host: 'localhost', path: '/pixel.gif?key=' + key, port: 5999
+      req.end()
+      req.on 'response', (resp) ->
+        resp.on 'end', ->
+          counter -= 1
+          ping.kill 'SIGUSR1' if counter is 0
+=======
   counter = 3
   for key, i in ['zero', 'one', 'two']
     for time in [0...i]
@@ -36,4 +54,6 @@ delay 500, ->
           ping.kill 'SIGUSR2'
       req.on 'error', (e) ->
         console.log 'ERROR', e
+>>>>>>> master
+
 

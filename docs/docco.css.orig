@@ -110,6 +110,14 @@ blockquote {
   margin: 0;
   padding: 1px 0 1px 1em;
 }
+<<<<<<< HEAD
+#background {
+  position: fixed;
+  top: 0; left: 575px; right: 0; bottom: 0;
+  background: #f5f5ff;
+  border-left: 1px solid #e5e5ee;
+  z-index: -1;
+=======
   .sections blockquote p {
     font-family: Menlo, Consolas, Monaco, monospace;
     font-size: 12px; line-height: 16px;
@@ -122,6 +130,7 @@ ul.sections {
   list-style: none;
   padding:0 0 5px 0;;
   margin:0;
+>>>>>>> master
 }
 
 /*
