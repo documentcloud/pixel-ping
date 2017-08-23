@@ -34,6 +34,7 @@
             <div class="content"><div class='highlight'><pre>fs          = <span class="hljs-built_in">require</span> <span class="hljs-string">'fs'</span>
 url         = <span class="hljs-built_in">require</span> <span class="hljs-string">'url'</span>
 http        = <span class="hljs-built_in">require</span> <span class="hljs-string">'http'</span>
+https       = <span class="hljs-built_in">require</span> <span class="hljs-string">'https'</span>
 querystring = <span class="hljs-built_in">require</span> <span class="hljs-string">'querystring'</span></pre></div></div>
             
         </li>
@@ -50,7 +51,7 @@ querystring = <span class="hljs-built_in">require</span> <span class="hljs-strin
             </div>
             
         </li>
-        
+    
         
         <li id="section-3">
             <div class="annotation">
@@ -62,10 +63,23 @@ querystring = <span class="hljs-built_in">require</span> <span class="hljs-strin
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.3'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.4'</span></pre></div></div>
             
         </li>
-        
+
+        <li id="section-3b">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3b">&#182;</a>
+              </div>
+              <p>Regular expression</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>httpsPattern = new RegExp(<span class="hljs-params">'^https://'</span>, <span class="hljs-params">'i'</span>);</span></pre></div></div>
+            
+        </li>
         
         <li id="section-4">
             <div class="annotation">
@@ -144,17 +158,22 @@ seconds.</p>
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Flushes the <code>store</code> to be saved by an external API. The contents of the store
-are sent to the configured <code>endpoint</code> URL via HTTP POST. If no <code>endpoint</code> is
+are sent to the configured <code>endpoint</code> URL via HTTP/HTTPS POST. If no <code>endpoint</code> is
 configured, this is a no-op.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">flush</span> = -&gt;</span>
   log store
-  <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> config.endpoint
+  <span class="hljs-keyword">if</span> !config.endpoint
+    return
+  <span class="hljs-keyword">else if</span> httpsPattern.test(config.endpoint)
+    endpointProtocol = https
+  <span class="hljs-keyword">else</span>
+    endpointProtocol = http
   data = serialize()
   endReqOpts[<span class="hljs-string">'headers'</span>][<span class="hljs-string">'Content-Length'</span>] = data.length
-  request = http.request endReqOpts, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
+  request = endpointProtocol.request endReqOpts, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
     reset()
     <span class="hljs-built_in">console</span>.info <span class="hljs-string">'--- flushed ---'</span>
   request.<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-params">(e)</span> -&gt;</span>

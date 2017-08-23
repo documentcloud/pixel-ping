@@ -2,12 +2,16 @@
 fs          = require 'fs'
 url         = require 'url'
 http        = require 'http'
+https        = require 'https'
 querystring = require 'querystring'
 
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.3'
+VERSION = '0.1.4'
+
+# Regular expression
+httpsPattern = new RegExp('^https://', 'i');
 
 # The in-memory hit `store` is just a hash. We map unique identifiers to the
 # number of hits they receive here, and flush the `store` every `interval`
@@ -24,7 +28,7 @@ record = (params) ->
 # `secret` token to the request object, if configured.
 serialize = ->
   data  = json: JSON.stringify(store)
-  data.secret = config.secret if config.secret
+  data.secret = config.secret if config.secret  
   querystring.stringify data
 
 # Reset the `store`.
@@ -32,14 +36,19 @@ reset = ->
   store = {}
 
 # Flushes the `store` to be saved by an external API. The contents of the store
-# are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
+# are sent to the configured `endpoint` URL via HTTP/HTTPS POST. If no `endpoint` is
 # configured, this is a no-op.
 flush = ->
   log store
-  return unless config.endpoint
+  if !config.endpoint
+    return
+  else if httpsPattern.test(config.endpoint)
+    endpointProtocol = https
+  else 
+    endpointProtocol = http
   data = serialize()
   endReqOpts['headers']['Content-Length'] = data.length
-  request = http.request endReqOpts, (response) ->
+  request = endpointProtocol.request endReqOpts, (response) ->
     reset()
     console.info '--- flushed ---'
   request.on 'error', (e) ->

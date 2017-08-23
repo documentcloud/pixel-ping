@@ -201,7 +201,15 @@ pixel-ping path/to/config.json</pre>
   "endpoint": "http://www.example.com/internal/save_hits",
   "discard": false
 }</pre>
-
+    <p>
+      If the endpoint is hosted on an https server, you must specify the port number after 
+      the domain name. For example:  
+    </p>
+    <pre>
+{
+"endpoint": "https://www.example.com:443/internal/save_hits",
+}
+    </pre>
     <h2 id="changes">Change Log</h2>
     <p>
       <b class="header">0.1.3</b><br />

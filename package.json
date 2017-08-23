@@ -4,7 +4,7 @@
   "homepage":     "http://github.com/documentcloud/pixel-ping",
   "keywords":     ["javascript", "server", "tracking"],
   "author":       "Jeremy Ashkenas and Jeff Larson",
-  "version":      "0.1.3",
+  "version":      "0.1.4",
   "licenses":     [{
     "type":       "MIT",
     "url":        "http://github.com/documentcloud/pixel-ping/raw/master/LICENSE"
