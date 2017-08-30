@@ -34,6 +34,7 @@
             <div class="content"><div class='highlight'><pre>fs          = <span class="hljs-built_in">require</span> <span class="hljs-string">'fs'</span>
 url         = <span class="hljs-built_in">require</span> <span class="hljs-string">'url'</span>
 http        = <span class="hljs-built_in">require</span> <span class="hljs-string">'http'</span>
+https        = <span class="hljs-built_in">require</span> <span class="hljs-string">'https'</span>
 querystring = <span class="hljs-built_in">require</span> <span class="hljs-string">'querystring'</span></pre></div></div>
             
         </li>
@@ -62,7 +63,7 @@ querystring = <span class="hljs-built_in">require</span> <span class="hljs-strin
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.3'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.4'</span></pre></div></div>
             
         </li>
         
@@ -72,6 +73,21 @@ querystring = <span class="hljs-built_in">require</span> <span class="hljs-strin
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Regular expression for HTTPS addresses</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>httpsPattern = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">'^https://'</span>, <span class="hljs-string">'i'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>The in-memory hit <code>store</code> is just a hash. We map unique identifiers to the
 number of hits they receive here, and flush the <code>store</code> every <code>interval</code>
@@ -84,11 +100,11 @@ seconds.</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Record a single incoming hit from the remote pixel.</p>
 
@@ -102,11 +118,11 @@ seconds.</p>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Serializes the current <code>store</code> to JSON, and creates a fresh one. Add a
 <code>secret</code> token to the request object, if configured.</p>
@@ -114,18 +130,18 @@ seconds.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">serialize</span> = -&gt;</span>
-  data  = <span class="hljs-attribute">json</span>: JSON.stringify(store)
-  data.secret = config.secret <span class="hljs-keyword">if</span> config.secret
+  data  = json: JSON.stringify(store)
+  data.secret = config.secret <span class="hljs-keyword">if</span> config.secret  
   querystring.stringify data</pre></div></div>
             
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Reset the <code>store</code>.</p>
 
@@ -137,24 +153,29 @@ seconds.</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Flushes the <code>store</code> to be saved by an external API. The contents of the store
-are sent to the configured <code>endpoint</code> URL via HTTP POST. If no <code>endpoint</code> is
+are sent to the configured <code>endpoint</code> URL via HTTP/HTTPS POST. If no <code>endpoint</code> is
 configured, this is a no-op.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">flush</span> = -&gt;</span>
   log store
-  <span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> config.endpoint
+  <span class="hljs-keyword">if</span> !config.endpoint
+    <span class="hljs-keyword">return</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> httpsPattern.test(config.endpoint)
+    endpointProtocol = https
+  <span class="hljs-keyword">else</span> 
+    endpointProtocol = http
   data = serialize()
   endReqOpts[<span class="hljs-string">'headers'</span>][<span class="hljs-string">'Content-Length'</span>] = data.length
-  request = http.request endReqOpts, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
+  request = endpointProtocol.request endReqOpts, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
     reset()
     <span class="hljs-built_in">console</span>.info <span class="hljs-string">'--- flushed ---'</span>
   request.<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-params">(e)</span> -&gt;</span>
@@ -166,11 +187,11 @@ configured, this is a no-op.</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Log the contents of the <code>store</code> to <strong>stdout</strong>. Happens on every flush, so that
 there’s a record of hits if something goes awry.</p>
@@ -180,31 +201,6 @@ there’s a record of hits if something goes awry.</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">log</span> = <span class="hljs-params">(hash)</span> -&gt;</span>
   <span class="hljs-keyword">for</span> key, hits <span class="hljs-keyword">of</span> hash
     <span class="hljs-built_in">console</span>.info <span class="hljs-string">"<span class="hljs-subst">#{hits}</span>:\t<span class="hljs-subst">#{key}</span>"</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p>Create a <code>Server</code> object. When a request comes in, ensure that it’s looking
-for <code>pixel.gif</code>. If it is, serve the pixel and record the request.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>server = http.createServer <span class="hljs-function"><span class="hljs-params">(req, res)</span> -&gt;</span>
-  params = url.parse req.url, <span class="hljs-literal">true</span>
-  <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.gif'</span>
-    res.writeHead <span class="hljs-number">200</span>, pixelHeaders
-    res.end pixel
-    record params
-  <span class="hljs-keyword">else</span>
-    res.writeHead <span class="hljs-number">404</span>, emptyHeaders
-    res.end <span class="hljs-string">''</span>
-  <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
@@ -252,7 +248,7 @@ pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>HTTP headers for the pixel image.</p>
+              <p>HTTP/HTTPS headers for the pixel image.</p>
 
             </div>
             
@@ -271,7 +267,7 @@ pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>HTTP headers for the 404 response.</p>
+              <p>HTTP/HTTPS headers for the 404 response.</p>
 
             </div>
             
@@ -288,7 +284,7 @@ pixel       = fs.readFileSync __dirname + <span class="hljs-string">'/pixel.gif'
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>If an <code>endpoint</code> has been configured, create an HTTP client connected to it,
+              <p>If an <code>endpoint</code> has been configured, create an HTTP/HTTPS client connected to it,
 and log a warning otherwise.</p>
 
             </div>
@@ -297,11 +293,11 @@ and log a warning otherwise.</p>
   <span class="hljs-built_in">console</span>.info <span class="hljs-string">"Flushing hits to <span class="hljs-subst">#{config.endpoint}</span>"</span>
   endParams = url.parse config.endpoint
   endReqOpts =
-    <span class="hljs-attribute">host</span>: endParams.hostname
-    <span class="hljs-attribute">port</span>: endParams.port <span class="hljs-keyword">or</span> <span class="hljs-number">80</span>
-    <span class="hljs-attribute">method</span>: <span class="hljs-string">'POST'</span>
-    <span class="hljs-attribute">path</span>: endParams.pathname
-    <span class="hljs-attribute">headers</span>:
+    host: endParams.hostname
+    port: endParams.port <span class="hljs-keyword">or</span> <span class="hljs-number">80</span>
+    method: <span class="hljs-string">'POST'</span>
+    path: endParams.pathname
+    headers:
       <span class="hljs-string">'host'</span>:         endParams.host
       <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/x-www-form-urlencoded'</span>
 <span class="hljs-keyword">else</span>
@@ -320,7 +316,7 @@ and log a warning otherwise.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'SIGUSR2'</span>,<span class="hljs-function"> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>process.<span class="hljs-literal">on</span> <span class="hljs-string">'SIGUSR2'</span>, <span class="hljs-function">-&gt;</span>
   <span class="hljs-built_in">console</span>.log <span class="hljs-string">'Got SIGUSR2. Forcing a flush:'</span>
   flush()</pre></div></div>
             
@@ -349,9 +345,25 @@ and log a warning otherwise.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <h3 id="startup">Startup</h3>
+              <p>Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert &amp;&amp; config.sslca
+  protocol = https;
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+   ca   : fs.readFileSync(config.sslca),
+  };
+<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert
+  protocol = https;
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+  };
+<span class="hljs-keyword">else</span>
+  protocol = http;</pre></div></div>
             
         </li>
         
@@ -361,6 +373,44 @@ and log a warning otherwise.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Create a <code>Server</code> object. When a request comes in, ensure that it’s looking
+for <code>pixel.gif</code>. If it is, serve the pixel and record the request.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>server = protocol.createServer protocolOptions, <span class="hljs-function"><span class="hljs-params">(req, res)</span> -&gt;</span>
+  params = url.parse req.url, <span class="hljs-literal">true</span>
+  <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.gif'</span>
+    res.writeHead <span class="hljs-number">200</span>, pixelHeaders
+    res.end pixel
+    record params
+  <span class="hljs-keyword">else</span>
+    res.writeHead <span class="hljs-number">404</span>, emptyHeaders
+    res.end <span class="hljs-string">''</span>
+  <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h3 id="startup">Startup</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Start the server listening for pixel hits, and begin the periodic data flush.</p>
 
