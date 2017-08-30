@@ -10,7 +10,7 @@ querystring = require 'querystring'
 # Keep the version number in sync with `package.json`.
 VERSION = '0.1.4'
 
-# Regular expression
+# Regular expression for HTTPS addresses
 httpsPattern = new RegExp('^https://', 'i');
 
 # The in-memory hit `store` is just a hash. We map unique identifiers to the
@@ -63,19 +63,6 @@ log = (hash) ->
   for key, hits of hash
     console.info "#{hits}:\t#{key}"
 
-# Create a `Server` object. When a request comes in, ensure that it's looking
-# for `pixel.gif`. If it is, serve the pixel and record the request.
-server = http.createServer (req, res) ->
-  params = url.parse req.url, true
-  if params.pathname is '/pixel.gif'
-    res.writeHead 200, pixelHeaders
-    res.end pixel
-    record params
-  else
-    res.writeHead 404, emptyHeaders
-    res.end ''
-  null
-
 #### Configuration
 
 # Load the configuration and the contents of the tracking pixel. Handle requests
@@ -90,19 +77,19 @@ if not configPath or (configPath in ['-h', '-help', '--help'])
 config      = JSON.parse fs.readFileSync(configPath).toString()
 pixel       = fs.readFileSync __dirname + '/pixel.gif'
 
-# HTTP headers for the pixel image.
+# HTTP/HTTPS headers for the pixel image.
 pixelHeaders =
   'Cache-Control':        'private, no-cache, proxy-revalidate, max-age=0'
   'Content-Type':         'image/gif'
   'Content-Disposition':  'inline'
   'Content-Length':       pixel.length
 
-# HTTP headers for the 404 response.
+# HTTP/HTTPS headers for the 404 response.
 emptyHeaders =
   'Content-Type':   'text/html'
   'Content-Length': '0'
 
-# If an `endpoint` has been configured, create an HTTP client connected to it,
+# If an `endpoint` has been configured, create an HTTP/HTTPS client connected to it,
 # and log a warning otherwise.
 if config.endpoint
   console.info "Flushing hits to #{config.endpoint}"
@@ -126,6 +113,36 @@ process.on 'SIGUSR2', ->
 # Don't let exceptions kill the server.
 process.on 'uncaughtException', (err) ->
   console.error "Uncaught Exception: #{err}"
+
+# Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server
+if config.sslkey && config.sslcert && config.sslca
+  protocol = https;
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+   ca   : fs.readFileSync(config.sslca),
+  };
+else if config.sslkey && config.sslcert
+  protocol = https;
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+  };
+else
+  protocol = http;
+
+# Create a `Server` object. When a request comes in, ensure that it's looking
+# for `pixel.gif`. If it is, serve the pixel and record the request.
+server = protocol.createServer protocolOptions, (req, res) ->
+  params = url.parse req.url, true
+  if params.pathname is '/pixel.gif'
+    res.writeHead 200, pixelHeaders
+    res.end pixel
+    record params
+  else
+    res.writeHead 404, emptyHeaders
+    res.end ''
+  null
 
 #### Startup
 
