@@ -45,15 +45,20 @@ merge = (new_store) ->
 flush = ->
   log store
   return unless config.endpoint
+  on_error = (message) ->
+    if !config.discard
+      merge(old_store)
+    console.log message
   data = serialize()
   old_store = reset()
   endReqOpts['headers']['Content-Length'] = data.length
-  request = http.request endReqOpts, (response) ->
-    console.info '--- flushed ---'
+  request = http.request endReqOpts, (res) ->
+    if res.statusCode <= 299 and res.statusCode >= 200
+      console.info '--- flushed ---'
+    else
+      on_error "--- flush failed with code:" + res.statusCode
   request.on 'error', (e) ->
-    if !config.discard
-      merge(old_store)
-    console.log "--- cannot connect to endpoint : #{e.message}"
+    on_error "--- cannot connect to endpoint : #{e.message}"
   request.write data
   request.end()
 
