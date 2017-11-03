@@ -11,12 +11,15 @@ server = http.createServer (req, res) ->
       hits = JSON.parse data.json
       if hits.one is 1 and hits.two is 2
         console.log 'Test Succeeded'
+        exit(0)
       else
         console.log 'Test Failed ', hits
-      ping.kill 'SIGINT'
-      process.exit 0
+        exit(1)
     res.end()
 
+exit = (code) ->
+  ping.kill 'SIGINT'
+  process.exit code
 
 server.listen 6999, 'localhost'
 
@@ -28,7 +31,7 @@ delay 500, ->
   counter = 3
   for key, i in ['zero', 'one', 'two']
     for time in [0...i]
-      req = http.get 'http://localhost:5999/pixel.gif?key=' + key, (resp) ->
+      req = send key, (resp) ->
         counter -= 1
         console.log 'sent ' + counter
         if counter is 0
@@ -37,3 +40,5 @@ delay 500, ->
       req.on 'error', (e) ->
         console.log 'ERROR', e
 
+send = (key, callback) ->
+   http.get 'http://localhost:5999/pixel.gif?key=' + key, callback
