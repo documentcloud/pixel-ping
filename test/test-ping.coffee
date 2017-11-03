@@ -27,18 +27,18 @@ ping = spawn 'node', ['bin/pixel-ping', 'test/config.json']
 
 delay = (time, func) -> setTimeout func, time
 
+counter = 3
 delay 500, ->
-  counter = 3
-  for key, i in ['zero', 'one', 'two']
-    for time in [0...i]
-      req = send key, (resp) ->
-        counter -= 1
-        console.log 'sent ' + counter
-        if counter is 0
-          console.log 'all requests came back, forcing flush..'
-          ping.kill 'SIGUSR2'
-      req.on 'error', (e) ->
-        console.log 'ERROR', e
+  send 'one'
+  send 'two'
+  send 'two'
 
 send = (key, callback) ->
-   http.get 'http://localhost:5999/pixel.gif?key=' + key, callback
+  req = http.get 'http://localhost:5999/pixel.gif?key=' + key, (resp) ->
+    counter -= 1
+    console.log 'sent ' + counter
+    if counter is 0
+      console.log 'all requests came back, forcing flush..'
+      ping.kill 'SIGUSR2'
+  req.on 'error', (e) ->
+    console.log 'ERROR', e
