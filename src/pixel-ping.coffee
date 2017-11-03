@@ -29,7 +29,15 @@ serialize = ->
 
 # Reset the `store`.
 reset = ->
+  old_store = store
   store = {}
+  old_store
+
+# Merge the given `store` with the current one.
+merge = (new_store) ->
+  for key, hits of new_store
+    store[key] or= 0
+    store[key] +=  hits
 
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
@@ -38,12 +46,13 @@ flush = ->
   log store
   return unless config.endpoint
   data = serialize()
+  old_store = reset()
   endReqOpts['headers']['Content-Length'] = data.length
   request = http.request endReqOpts, (response) ->
-    reset()
     console.info '--- flushed ---'
   request.on 'error', (e) ->
-    reset() if config.discard
+    if !config.discard
+      merge(old_store)
     console.log "--- cannot connect to endpoint : #{e.message}"
   request.write data
   request.end()
