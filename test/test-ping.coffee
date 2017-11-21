@@ -40,7 +40,7 @@ send = (key, callback) ->
     console.log 'ERROR', e
 
 flush_and_assert = (callback) ->
-  flush_assertions.push(callback) if callback
+  flush_assertions.push(callback)
   ping.kill 'SIGUSR2'
 
 delay 500, ->
