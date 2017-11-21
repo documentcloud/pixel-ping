@@ -52,7 +52,7 @@ flush = ->
     console.log message
   endReqOpts['headers']['Content-Length'] = data.length
   request = http.request endReqOpts, (res) ->
-    if res.statusCode <= 299 and res.statusCode >= 200
+    if isSuccess(res)
       console.info '--- flushed ---'
     else
       on_error "--- flush failed with code:" + res.statusCode
@@ -66,6 +66,9 @@ flush = ->
 log = (hash) ->
   for key, hits of hash
     console.info "#{hits}:\t#{key}"
+
+isSuccess = (res) ->
+  res.statusCode <= 299 and res.statusCode >= 200
 
 # Create a `Server` object. When a request comes in, ensure that it's looking
 # for `pixel.gif`. If it is, serve the pixel and record the request.
