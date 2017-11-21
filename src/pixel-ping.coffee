@@ -45,12 +45,11 @@ merge = (new_store) ->
 flush = ->
   log store
   return unless config.endpoint
-  on_error = (message) ->
-    if !config.discard
-      merge(oldStore)
-    console.log message
   data = serialize()
   oldStore = reset()
+  on_error = (message) ->
+    merge(oldStore) unless config.discard
+    console.log message
   endReqOpts['headers']['Content-Length'] = data.length
   request = http.request endReqOpts, (res) ->
     if res.statusCode <= 299 and res.statusCode >= 200
