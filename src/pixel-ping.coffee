@@ -29,9 +29,9 @@ serialize = ->
 
 # Reset the `store`.
 reset = ->
-  old_store = store
+  oldStore = store
   store = {}
-  old_store
+  oldStore
 
 # Merge the given `store` with the current one.
 merge = (new_store) ->
@@ -47,10 +47,10 @@ flush = ->
   return unless config.endpoint
   on_error = (message) ->
     if !config.discard
-      merge(old_store)
+      merge(oldStore)
     console.log message
   data = serialize()
-  old_store = reset()
+  oldStore = reset()
   endReqOpts['headers']['Content-Length'] = data.length
   request = http.request endReqOpts, (res) ->
     if res.statusCode <= 299 and res.statusCode >= 200
