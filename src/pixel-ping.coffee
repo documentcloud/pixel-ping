@@ -17,8 +17,7 @@ store = {}
 # Record a single incoming hit from the remote pixel.
 record = (params) ->
   return unless key = params.query?.key
-  store[key] or= 0
-  store[key] +=  1
+  increment(key, 1)
 
 # Serializes the current `store` to JSON, and creates a fresh one. Add a
 # `secret` token to the request object, if configured.
@@ -36,8 +35,12 @@ reset = ->
 # Merge the given `store` with the current one.
 merge = (new_store) ->
   for key, hits of new_store
-    store[key] or= 0
-    store[key] +=  hits
+    increment(key, hits)
+
+increment = (key, value) ->
+  store[key] or= 0
+  store[key] += value
+
 
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP POST. If no `endpoint` is
