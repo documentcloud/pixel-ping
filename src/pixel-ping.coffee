@@ -33,8 +33,8 @@ reset = ->
   oldStore
 
 # Merge the given `store` with the current one.
-merge = (new_store) ->
-  for key, hits of new_store
+merge = (newStore) ->
+  for key, hits of newStore
     increment(key, hits)
 
 increment = (key, value) ->
@@ -50,7 +50,7 @@ flush = ->
   return unless config.endpoint
   data = serialize()
   oldStore = reset()
-  on_error = (message) ->
+  onError = (message) ->
     merge(oldStore) unless config.discard
     console.log message
   endReqOpts['headers']['Content-Length'] = data.length
@@ -58,9 +58,9 @@ flush = ->
     if isSuccess(res)
       console.info '--- flushed ---'
     else
-      on_error "--- flush failed with code:" + res.statusCode
+      onError "--- flush failed with code:" + res.statusCode
   request.on 'error', (e) ->
-    on_error "--- cannot connect to endpoint : #{e.message}"
+    onError "--- cannot connect to endpoint : #{e.message}"
   request.write data
   request.end()
 
