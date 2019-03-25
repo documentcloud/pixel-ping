@@ -137,7 +137,7 @@
     </p>
 
     <p>
-      <i>Pixel Ping is currently at <b>version 0.1.2</b>, and is an open-source
+      <i>Pixel Ping is currently at <b>version 0.1.5</b>, and is an open-source
       component of <a href="http://www.documentcloud.org/">DocumentCloud</a>.</i>
     </p>
 
@@ -244,12 +244,25 @@ pixel-ping path/to/config.json</pre>
     </pre>
     <h2 id="changes">Change Log</h2>
     <p>
-      <b class="header">0.1.3</b><br /> Changed the signal from USR1 (which is used by node for debugging) to USR2 and upgraded
-      to <tt>http.request</tt> thanks to
-      <a href="https://github.com/gka">gka</a>.
+      <b class="header">0.1.5</b> <i>March 25, 2019</i><br />
+      Fixed a data loss bug, where hits that were recorded <i>during</i> a flush
+      would be discarded, thanks to
+      <a href="https://github.com/danielbeardsley">Daniel Beardsley</a>.
     </p>
     <p>
-      <b class="header">0.1.2</b><br /> Initial release.
+      <b class="header">0.1.4</b> <i>August 22, 2017</i><br />
+      Added HTTPS support, for both the pixel server and the endpoint flush,
+      thanks to Maxwell Francisco.
+    </p>
+    <p>
+      <b class="header">0.1.3</b> <i>May 29, 2014</i><br /> Changed the signal from USR1
+      (which is used by node for debugging) to USR2 and upgraded
+      to <tt>http.request</tt> thanks to
+      <a href="https://github.com/gka">Jeff Larson</a> and
+      <a href="https://github.com/gka">Gregor Aisch</a>.
+    </p>
+    <p>
+      <b class="header">0.1.2</b> <i>September 8, 2010</i><br /> Initial release.
     </p>
 
     <p>

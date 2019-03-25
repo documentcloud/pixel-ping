@@ -2,13 +2,13 @@
 fs          = require 'fs'
 url         = require 'url'
 http        = require 'http'
-https        = require 'https'
+https       = require 'https'
 querystring = require 'querystring'
 
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 
 # Regular expression for HTTPS addresses
 httpsPattern = new RegExp('^https://', 'i');
@@ -18,42 +18,50 @@ httpsPattern = new RegExp('^https://', 'i');
 # seconds.
 store = {}
 
-# Record a single incoming hit from the remote pixel.
-record = (params) ->
-  return unless key = params.query?.key
+# Record hits from the remote pixel.
+record = (key, count) ->
   store[key] or= 0
-  store[key] +=  1
+  store[key] += count
 
 # Serializes the current `store` to JSON, and creates a fresh one. Add a
 # `secret` token to the request object, if configured.
 serialize = ->
   data  = json: JSON.stringify(store)
-  data.secret = config.secret if config.secret  
+  data.secret = config.secret if config.secret
   querystring.stringify data
 
 # Reset the `store`.
 reset = ->
+  oldStore = store
   store = {}
+  oldStore
+
+# Merge the given `store` with the current one.
+merge = (newStore) ->
+  for key, count of newStore
+    record key, count
+  null
 
 # Flushes the `store` to be saved by an external API. The contents of the store
 # are sent to the configured `endpoint` URL via HTTP/HTTPS POST. If no `endpoint` is
 # configured, this is a no-op.
 flush = ->
   log store
-  if !config.endpoint
-    return
-  else if httpsPattern.test(config.endpoint)
-    endpointProtocol = https
-  else 
-    endpointProtocol = http
+  return unless config.endpoint
+  endpointProtocol = if httpsPattern.test(config.endpoint) then https else http
   data = serialize()
+  oldStore = reset()
+  onError = (message) ->
+    merge(oldStore) unless config.discard
+    console.error message
   endReqOpts['headers']['Content-Length'] = data.length
-  request = endpointProtocol.request endReqOpts, (response) ->
-    reset()
-    console.info '--- flushed ---'
+  request = endpointProtocol.request endReqOpts, (res) ->
+    if 200 <= res.statusCode < 300
+      console.info '--- flushed ---'
+    else
+      onError "--- flush failed with code:" + res.statusCode
   request.on 'error', (e) ->
-    reset() if config.discard
-    console.log "--- cannot connect to endpoint : #{e.message}"
+    onError "--- cannot connect to endpoint : #{e.message}"
   request.write data
   request.end()
 
@@ -62,6 +70,7 @@ flush = ->
 log = (hash) ->
   for key, hits of hash
     console.info "#{hits}:\t#{key}"
+  null
 
 #### Configuration
 
@@ -132,13 +141,14 @@ else
   protocol = http;
 
 # Create a `Server` object. When a request comes in, ensure that it's looking
-# for `pixel.gif`. If it is, serve the pixel and record the request.
+# for `pixel.gif`. If it is, serve the pixel and record a hit.
 server = protocol.createServer protocolOptions, (req, res) ->
   params = url.parse req.url, true
   if params.pathname is '/pixel.gif'
     res.writeHead 200, pixelHeaders
     res.end pixel
-    record params
+    if key = params.query?.key
+      record key, 1
   else
     res.writeHead 404, emptyHeaders
     res.end ''
