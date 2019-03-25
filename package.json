@@ -18,5 +18,9 @@
   },
   "bin":          {
     "pixel-ping": "./bin/pixel-ping"
+  },
+  "devDependencies": {
+    "cake": "^0.1.1",
+    "coffeescript": "^2.1.0"
   }
 }

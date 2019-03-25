@@ -105,12 +105,12 @@ if config.endpoint
   endParams = url.parse config.endpoint
   endReqOpts =
     host: endParams.hostname
-    port: endParams.port or 80
     method: 'POST'
     path: endParams.pathname
     headers:
       'host':         endParams.host
       'Content-Type': 'application/x-www-form-urlencoded'
+  endReqOpts.port = endParams.port if endParams.port
 else
   console.warn "No endpoint set. Hits won't be flushed, add \"endpoint\" to #{configPath}."
 
