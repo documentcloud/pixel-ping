@@ -8,7 +8,7 @@ querystring = require 'querystring'
 #### The Pixel Ping server
 
 # Keep the version number in sync with `package.json`.
-VERSION = '0.1.5'
+VERSION = '0.1.6'
 
 # Regular expression for HTTPS addresses
 httpsPattern = new RegExp('^https://', 'i');

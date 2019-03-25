@@ -1,9 +1,8 @@
 fs            = require 'fs'
-{print}       = require 'sys'
 {spawn, exec} = require 'child_process'
 
 log = (data) ->
-  print data.toString()
+  console.log data.toString()
 
 task 'build', 'Build and watch the CoffeeScript source files', ->
   coffee = spawn 'node_modules/.bin/coffee', ['-cw', '-o', 'lib', 'src']

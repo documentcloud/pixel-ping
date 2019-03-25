@@ -63,7 +63,7 @@ querystring = <span class="hljs-built_in">require</span> <span class="hljs-strin
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.5'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>VERSION = <span class="hljs-string">'0.1.6'</span></pre></div></div>
             
         </li>
         
@@ -315,12 +315,12 @@ and log a warning otherwise.</p>
   endParams = url.parse config.endpoint
   endReqOpts =
     host: endParams.hostname
-    port: endParams.port <span class="hljs-keyword">or</span> <span class="hljs-number">80</span>
     method: <span class="hljs-string">'POST'</span>
     path: endParams.pathname
     headers:
       <span class="hljs-string">'host'</span>:         endParams.host
       <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/x-www-form-urlencoded'</span>
+  endReqOpts.port = endParams.port <span class="hljs-keyword">if</span> endParams.port
 <span class="hljs-keyword">else</span>
   <span class="hljs-built_in">console</span>.warn <span class="hljs-string">"No endpoint set. Hits won't be flushed, add \"endpoint\" to <span class="hljs-subst">#{configPath}</span>."</span></pre></div></div>
             
