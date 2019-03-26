@@ -28,7 +28,7 @@ exit = (code) ->
 
 server.listen 6999, 'localhost'
 
-ping = spawn 'node', ['bin/pixel-ping', 'test/config.json']
+ping = spawn 'node', ['bin/pixel-ping', 'test/config.json'], {stdio: 'inherit'}
 
 delay = (time, func) -> setTimeout func, time
 
