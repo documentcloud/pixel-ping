@@ -1,26 +1,38 @@
 {
-  "name":         "pixel-ping",
-  "description":  "A minimalist pixel tracker.",
-  "homepage":     "http://github.com/documentcloud/pixel-ping",
-  "keywords":     ["javascript", "server", "tracking"],
-  "author":       "Jeremy Ashkenas and Jeff Larson",
-  "version":      "0.1.6",
-  "licenses":     [{
-    "type":       "MIT",
-    "url":        "http://github.com/documentcloud/pixel-ping/raw/master/LICENSE"
-  }],
-  "directories":  {
+  "name": "pixel-ping",
+  "description": "A minimalist pixel tracker.",
+  "homepage": "http://github.com/documentcloud/pixel-ping",
+  "keywords": [
+    "javascript",
+    "server",
+    "tracking"
+  ],
+  "author": "Jeremy Ashkenas and Jeff Larson",
+  "version": "0.1.6",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/documentcloud/pixel-ping/raw/master/LICENSE"
+    }
+  ],
+  "directories": {
     "lib": "./lib"
   },
-  "repository":   {
+  "repository": {
     "type": "git",
-    "url":  "http://github.com/document-cloud/pixel-ping.git"
+    "url": "http://github.com/document-cloud/pixel-ping.git"
   },
-  "bin":          {
+  "bin": {
     "pixel-ping": "./bin/pixel-ping"
   },
   "devDependencies": {
-    "cake": "^0.1.1",
-    "coffeescript": "^2.1.0"
+    "coffeescript": "^2.1.0",
+    "docco": "^0.8.0"
+  },
+  "scripts": {
+    "doc": "cd src && docco pixel-ping.coffee -o ../docs",
+    "compile": "coffee -c -o lib src",
+    "watch": "coffee -cw -o lib src",
+    "test": "coffee -c -o lib src && coffee test/test-ping.coffee"
   }
 }

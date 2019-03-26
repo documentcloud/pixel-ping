@@ -123,26 +123,9 @@ process.on 'SIGUSR2', ->
 process.on 'uncaughtException', (err) ->
   console.error "Uncaught Exception: #{err}"
 
-# Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server
-if config.sslkey && config.sslcert && config.sslca
-  protocol = https;
-  protocolOptions = {
-   key  : fs.readFileSync(config.sslkey),
-   cert : fs.readFileSync(config.sslcert),
-   ca   : fs.readFileSync(config.sslca),
-  };
-else if config.sslkey && config.sslcert
-  protocol = https;
-  protocolOptions = {
-   key  : fs.readFileSync(config.sslkey),
-   cert : fs.readFileSync(config.sslcert),
-  };
-else
-  protocol = http;
-
-# Create a `Server` object. When a request comes in, ensure that it's looking
+# When a request comes in, ensure that it's looking
 # for `pixel.gif`. If it is, serve the pixel and record a hit.
-server = protocol.createServer protocolOptions, (req, res) ->
+handleRequest = (req, res) ->
   params = url.parse req.url, true
   if params.pathname is '/pixel.gif'
     res.writeHead 200, pixelHeaders
@@ -153,6 +136,24 @@ server = protocol.createServer protocolOptions, (req, res) ->
     res.writeHead 404, emptyHeaders
     res.end ''
   null
+
+
+# Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server
+if config.sslkey && config.sslcert && config.sslca
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+   ca   : fs.readFileSync(config.sslca),
+  };
+  server = https.createServer(protocolOptions, handleRequest)
+else if config.sslkey && config.sslcert
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+  };
+  server = https.createServer(protocolOptions, handleRequest)
+else
+  server = http.createServer(handleRequest)
 
 #### Startup
 
