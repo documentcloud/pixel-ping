@@ -366,41 +366,12 @@ and log a warning otherwise.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert &amp;&amp; config.sslca
-  protocol = https;
-  protocolOptions = {
-   key  : fs.readFileSync(config.sslkey),
-   cert : fs.readFileSync(config.sslcert),
-   ca   : fs.readFileSync(config.sslca),
-  };
-<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert
-  protocol = https;
-  protocolOptions = {
-   key  : fs.readFileSync(config.sslkey),
-   cert : fs.readFileSync(config.sslcert),
-  };
-<span class="hljs-keyword">else</span>
-  protocol = http;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <p>Create a <code>Server</code> object. When a request comes in, ensure that it’s looking
+              <p>When a request comes in, ensure that it’s looking
 for <code>pixel.gif</code>. If it is, serve the pixel and record a hit.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>server = protocol.createServer protocolOptions, <span class="hljs-function"><span class="hljs-params">(req, res)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">handleRequest</span> = <span class="hljs-params">(req, res)</span> -&gt;</span>
   params = url.parse req.url, <span class="hljs-literal">true</span>
   <span class="hljs-keyword">if</span> params.pathname <span class="hljs-keyword">is</span> <span class="hljs-string">'/pixel.gif'</span>
     res.writeHead <span class="hljs-number">200</span>, pixelHeaders
@@ -411,6 +382,35 @@ for <code>pixel.gif</code>. If it is, serve the pixel and record a hit.</p>
     res.writeHead <span class="hljs-number">404</span>, emptyHeaders
     res.end <span class="hljs-string">''</span>
   <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Determines the right protocol (HTTP/HTTPS) to be used on the nodejs server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert &amp;&amp; config.sslca
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+   ca   : fs.readFileSync(config.sslca),
+  };
+  server = https.createServer(protocolOptions, handleRequest)
+<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> config.sslkey &amp;&amp; config.sslcert
+  protocolOptions = {
+   key  : fs.readFileSync(config.sslkey),
+   cert : fs.readFileSync(config.sslcert),
+  };
+  server = https.createServer(protocolOptions, handleRequest)
+<span class="hljs-keyword">else</span>
+  server = http.createServer(handleRequest)</pre></div></div>
             
         </li>
         
