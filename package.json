@@ -26,7 +26,13 @@
     "pixel-ping": "./bin/pixel-ping"
   },
   "devDependencies": {
-    "cake": "^0.1.1",
-    "coffeescript": "^2.1.0"
+    "coffeescript": "^2.1.0",
+    "docco": "^0.8.0"
+  },
+  "scripts": {
+    "doc": "cd src && docco pixel-ping.coffee -o ../docs",
+    "compile": "coffee -c -o lib src",
+    "watch": "coffee -cw -o lib src",
+    "test": "coffee -c -o lib src && coffee test/test-ping.coffee"
   }
 }
